@@ -1,0 +1,413 @@
+@import "tailwindcss";
+
+/* ===========================
+   GOOGLE FONTS
+=========================== */
+@layer base {
+  :root {
+    /* === FUNDOS PREMIUM === */
+    --bg-base:        #06080D; /* Quase preto profundo */
+    --bg-surface:     #0D111A; /* Superfícies elevadas */
+    --bg-card:        rgba(20, 25, 35, 0.5); /* Translúcido */
+    --bg-card-hover:  rgba(30, 36, 48, 0.6);
+
+    /* === NEON SUAVE (Linear/iOS style) === */
+    --neon-green:        #10B981; /* Emerald suave, não grita na tela */
+    --neon-green-glow:   rgba(16, 185, 129, 0.15);
+    --neon-blue:         #3B82F6;
+    --neon-blue-glow:    rgba(59, 130, 246, 0.15);
+    --neon-red:          #EF4444;
+    --neon-red-glow:     rgba(239, 68, 68, 0.15);
+    --neon-purple:       #8B5CF6;
+    --neon-purple-glow:  rgba(139, 92, 246, 0.15);
+    --neon-yellow:       #F59E0B;
+    --neon-yellow-glow:  rgba(245, 158, 11, 0.15);
+
+    /* === TEXTO === */
+    --text-primary:   #F8FAFC;
+    --text-secondary: #94A3B8;
+    --text-muted:     #475569;
+
+    /* === BORDAS & DIVISORES === */
+    --border-subtle:  rgba(255, 255, 255, 0.03);
+    --border-card:    rgba(255, 255, 255, 0.06);
+    --border-active:  rgba(16, 185, 129, 0.3);
+  }
+}
+
+/* ===========================
+   RESET & BASE
+=========================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-base);
+}
+
+body {
+  height: 100%;
+  overflow: hidden;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-weight: 400;
+  color: var(--text-primary);
+  background-color: var(--bg-base);
+  background-image: 
+    radial-gradient(ellipse at top left, rgba(255, 255, 255, 0.02) 0%, transparent 60%),
+    radial-gradient(ellipse at bottom right, rgba(16, 185, 129, 0.015) 0%, transparent 50%);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100%;
+  display: flex;
+  justify-content: center; /* Centraliza no desktop */
+  overflow: hidden;
+}
+
+/* Container principal responsivo (Mobile First -> Max Desktop) */
+.mobile-container {
+  width: 100%;
+  max-width: 480px;
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-base);
+  box-shadow: 0 0 50px rgba(0,0,0,0.5); /* Sombra apenas vista no desktop */
+  overflow: hidden;
+}
+
+/* ===========================
+   TYPOGRAPHY
+=========================== */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.font-display {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.font-body {
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ===========================
+   SCROLLABLE CONTAINER
+=========================== */
+.scroll-area {
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+}
+.scroll-area::-webkit-scrollbar { display: none; }
+
+.scroll-x {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scroll-x::-webkit-scrollbar { display: none; }
+
+/* ===========================
+   CARD PREMIUM (Minimal Depth)
+=========================== */
+.card {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-card);
+  border-radius: 16px;
+  transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: transform;
+}
+
+.card-hover:hover {
+  background: var(--bg-card-hover);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.card-active:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+/* Divisores finos em vez de cards */
+.list-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  background: transparent;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  color: inherit;
+  width: 100%;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  text-align: left;
+}
+.list-item:active {
+  opacity: 0.6;
+}
+.list-item:last-child {
+  border-bottom: none;
+}
+
+/* ===========================
+   BOTÕES
+=========================== */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--neon-green);
+  color: #000;
+  border-radius: 14px;
+  padding: 16px 24px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 4px 12px var(--neon-green-glow);
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+  cursor: pointer;
+  width: 100%;
+}
+
+.btn-primary:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 4px var(--neon-green-glow);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+}
+
+.btn-ghost:active {
+  transform: scale(0.96);
+}
+
+/* ===========================
+   INPUTS ELEGANTE
+=========================== */
+.input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-card);
+  border-radius: 0;
+  padding: 12px 0;
+  color: var(--text-primary);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  width: 100%;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.input:focus {
+  border-bottom-color: var(--neon-green);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ===========================
+   PROGRESS BAR MINIMAL
+=========================== */
+.progress-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.progress-fill.green { background: var(--neon-green); }
+.progress-fill.yellow { background: var(--neon-yellow); }
+.progress-fill.red { background: var(--neon-red); }
+
+/* ===========================
+   BADGES & CHIPS (Compactos)
+=========================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.chip.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===========================
+   DOCK NAV (Floating Bottom)
+=========================== */
+.dock-container {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: none; /* Deixa cliques passarem onde não tem o nav */
+  z-index: 40;
+}
+
+.dock {
+  display: flex;
+  align-items: center;
+  background: rgba(13, 17, 26, 0.7);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  padding: 8px 12px;
+  gap: 12px;
+  pointer-events: auto; /* Reativa cliques dentro da dock */
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+
+.dock-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background: transparent;
+  border: none;
+}
+.dock-item.active {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.dock-fab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+  background: var(--text-primary);
+  color: #000;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+  margin: 0 4px;
+}
+.dock-fab:active {
+  transform: scale(0.92);
+}
+
+/* ===========================
+   SECTION LABEL
+=========================== */
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ===========================
+   DOTS
+=========================== */
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.dot.green { background: var(--neon-green); box-shadow: 0 0 6px var(--neon-green-glow); }
+.dot.yellow { background: var(--neon-yellow); }
+.dot.red { background: var(--neon-red); box-shadow: 0 0 6px var(--neon-red-glow); }
+
+/* ===========================
+   MODAL / SHEET
+=========================== */
+.modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+}
+
+.modal-sheet {
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-card);
+  border-radius: 24px 24px 0 0;
+  padding: 24px;
+  width: 100%;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom));
+  max-height: 90vh;
+  overflow-y: auto;
+}
