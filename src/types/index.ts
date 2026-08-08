@@ -6,7 +6,6 @@ export type Categoria =
   | 'Limpeza'
   | 'Higiene'
   | 'Farmácia'
-  | 'Não Essencial'
   | 'Outros';
 
 export type Unidade = 'un' | 'kg' | 'g' | 'L' | 'mL' | 'cx' | 'pct';
@@ -39,6 +38,12 @@ export interface Meta {
   valor: number;
 }
 
+export interface ItemLista {
+  id: string;
+  produto: string;
+  comprado: boolean;
+}
+
 export const CATEGORIAS: { label: Categoria; emoji: string; essencial: boolean }[] = [
   { label: 'Alimentação', emoji: '🌾', essencial: true },
   { label: 'Hortifruti', emoji: '🥦', essencial: true },
@@ -47,7 +52,6 @@ export const CATEGORIAS: { label: Categoria; emoji: string; essencial: boolean }
   { label: 'Limpeza', emoji: '🧴', essencial: true },
   { label: 'Higiene', emoji: '🪥', essencial: true },
   { label: 'Farmácia', emoji: '💊', essencial: true },
-  { label: 'Não Essencial', emoji: '🍫', essencial: false },
   { label: 'Outros', emoji: '📦', essencial: false },
 ];
 
@@ -59,6 +63,5 @@ export const CATEGORIA_EMOJI: Record<Categoria, string> = {
   'Limpeza': '🧴',
   'Higiene': '🪥',
   'Farmácia': '💊',
-  'Não Essencial': '🍫',
   'Outros': '📦',
 };

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Compra, Estoque, Meta } from '../types';
+import type { Compra, Estoque, Meta, ItemLista } from '../types';
 import { SEED_COMPRAS, SEED_ESTOQUE, COMPRAS_JULHO } from './seedData';
 import { format, isSameMonth, parseISO } from 'date-fns';
 import {
@@ -15,6 +15,10 @@ import {
   upsertMeta,
   fetchMercados,
   insertMercado,
+  fetchListaCompras,
+  insertItemLista,
+  updateItemListaRow,
+  deleteItemListaRow,
 } from './supabaseSync';
 
 interface AppState {
@@ -23,6 +27,7 @@ interface AppState {
   estoque: Estoque[];
   meta: Meta;
   mercados: string[];
+  listaCompras: ItemLista[];
 
   // Estado de carregamento
   loading: boolean;
@@ -48,6 +53,11 @@ interface AppState {
   // Mercados
   addMercado: (nome: string) => Promise<void>;
 
+  // Lista de compras
+  addItemLista: (produto: string) => Promise<void>;
+  renameItemLista: (id: string, produto: string) => Promise<void>;
+  removeItemLista: (id: string) => Promise<void>;
+
   // Computed (called as functions)
   getTotalMes: (mes?: string) => number;
   getPercMeta: () => number;
@@ -65,6 +75,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   estoque: [],
   meta: { mes: currentMes(), valor: 800 },
   mercados: [],
+  listaCompras: [],
   loading: false,
   loaded: false,
   loadError: null,
@@ -72,10 +83,11 @@ export const useAppStore = create<AppState>()((set, get) => ({
   loadFromSupabase: async () => {
     set({ loading: true, loadError: null });
     try {
-      let [compras, estoque, mercados] = await Promise.all([
+      let [compras, estoque, mercados, listaCompras] = await Promise.all([
         fetchCompras(),
         fetchEstoque(),
         fetchMercados(),
+        fetchListaCompras(),
       ]);
 
       // Primeira vez que o app roda com o banco vazio: popula com os dados iniciais
@@ -94,7 +106,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
         await upsertMeta(meta);
       }
 
-      set({ compras, estoque, mercados, meta, loading: false, loaded: true });
+      set({ compras, estoque, mercados, meta, listaCompras, loading: false, loaded: true });
     } catch (err) {
       set({
         loading: false,
@@ -148,6 +160,23 @@ export const useAppStore = create<AppState>()((set, get) => ({
     if (mercados.includes(nome)) return;
     await insertMercado(nome);
     set((s) => ({ mercados: [...s.mercados, nome] }));
+  },
+
+  addItemLista: async (produto) => {
+    const novo = await insertItemLista(produto);
+    set((s) => ({ listaCompras: [...s.listaCompras, novo] }));
+  },
+
+  renameItemLista: async (id, produto) => {
+    await updateItemListaRow(id, { produto });
+    set((s) => ({
+      listaCompras: s.listaCompras.map((i) => (i.id === id ? { ...i, produto } : i)),
+    }));
+  },
+
+  removeItemLista: async (id) => {
+    await deleteItemListaRow(id);
+    set((s) => ({ listaCompras: s.listaCompras.filter((i) => i.id !== id) }));
   },
 
   getComprasDoMes: (mes) => {

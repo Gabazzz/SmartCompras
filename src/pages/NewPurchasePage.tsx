@@ -1,29 +1,39 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check, Delete, ArrowRight, Pencil } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAppStore } from '../store/useAppStore';
 import { CATEGORIA_EMOJI, type Categoria, type Unidade } from '../types';
-import { detectarCategoria } from '../utils/categorizador';
+import { detectarCategoria, sugerirSuperfluo } from '../utils/categorizador';
 
 const CATEGORIAS: Categoria[] = [
   'Alimentação', 'Hortifruti', 'Laticínios', 'Carnes',
-  'Limpeza', 'Higiene', 'Farmácia', 'Não Essencial', 'Outros',
+  'Limpeza', 'Higiene', 'Farmácia', 'Outros',
 ];
 const UNIDADES: Unidade[] = ['un', 'kg', 'g', 'L', 'mL', 'cx', 'pct'];
 
+interface NewPurchaseNavState {
+  produto?: string;
+  estoqueId?: string;
+  quantidadeSugerida?: number;
+  listaId?: string;
+}
+
 export default function NewPurchasePage() {
   const navigate = useNavigate();
-  const { addCompra, compras } = useAppStore();
+  const location = useLocation();
+  const navState = (location.state as NewPurchaseNavState | null) ?? null;
+  const { addCompra, compras, estoque, updateEstoque, removeItemLista } = useAppStore();
 
   const [step, setStep] = useState<1 | 2>(1);
-  const [produto, setProduto] = useState('');
+  const [produto, setProduto] = useState(navState?.produto ?? '');
   const [categoria, setCategoria] = useState<Categoria | ''>('');
   const [categoriaAuto, setCategoriaAuto] = useState(true); // true enquanto a categoria não foi escolhida manualmente
   const [essencial, setEssencial] = useState(true);
+  const [essencialAuto, setEssencialAuto] = useState(true); // true enquanto o usuário não mexeu manualmente no toggle
   const [valorStr, setValorStr] = useState('0');
-  const [qtd, setQtd] = useState('1');
+  const [qtd, setQtd] = useState(navState?.quantidadeSugerida ? String(navState.quantidadeSugerida) : '1');
   const [unidade, setUnidade] = useState<Unidade>('un');
 
   const prodInputRef = useRef<HTMLInputElement>(null);
@@ -36,6 +46,12 @@ export default function NewPurchasePage() {
     if (step === 1) setTimeout(() => prodInputRef.current?.focus(), 100);
   }, [step]);
 
+  // Se veio de "Estoque Baixo" ou da lista de compras, já tenta detectar categoria/essencial
+  useEffect(() => {
+    if (navState?.produto) handleProdutoChange(navState.produto);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const selectProd = (p: string) => {
     setProduto(p);
     const last = compras.find((c) => c.produto === p);
@@ -43,12 +59,19 @@ export default function NewPurchasePage() {
       setCategoria(last.categoria);
       setCategoriaAuto(false); // produto já conhecido, categoria confirmada
       setEssencial(last.essencial);
+      setEssencialAuto(false);
       setUnidade(last.unidade);
     }
   };
 
   const handleProdutoChange = (valor: string) => {
     setProduto(valor);
+
+    if (essencialAuto) {
+      const superfluo = sugerirSuperfluo(valor);
+      if (superfluo === false) setEssencial(false);
+    }
+
     if (!categoriaAuto) return; // usuário já escolheu a categoria manualmente, não sobrescreve
 
     // 1) Tenta achar no histórico (produto exatamente já comprado antes)
@@ -72,6 +95,11 @@ export default function NewPurchasePage() {
     setCategoriaAuto(false); // trava: a partir daqui, digitar não sobrescreve mais
   };
 
+  const handleEssencialManual = () => {
+    setEssencial((p) => !p);
+    setEssencialAuto(false); // usuário decidiu manualmente, não sobrescreve mais
+  };
+
   const handleNumpad = (val: string) => {
     if (val === 'back') {
       setValorStr((s) => (s.length > 1 ? s.slice(0, -1) : '0'));
@@ -87,7 +115,7 @@ export default function NewPurchasePage() {
   const valUnitario = (valFinal / (parseFloat(qtd) || 1)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   const canContinue = !!produto && !!categoria;
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!produto || !categoria) {
       toast.error('Preencha os campos obrigatórios', {
         style: { background: '#131318', color: '#e4e1e9', border: '1px solid rgba(255,255,255,0.1)' },
@@ -100,17 +128,35 @@ export default function NewPurchasePage() {
       });
       return;
     }
-    addCompra({
+    const quantidadeComprada = parseFloat(qtd) || 1;
+    await addCompra({
       produto,
       categoria,
       essencial,
       mercado: '',
-      quantidade: parseFloat(qtd) || 1,
+      quantidade: quantidadeComprada,
       unidade,
-      valorUni: valFinal / (parseFloat(qtd) || 1),
+      valorUni: valFinal / quantidadeComprada,
       valorTotal: valFinal,
       data: new Date().toISOString(),
     });
+
+    // Fecha o ciclo: se veio do Estoque Baixo, repõe o estoque automaticamente
+    if (navState?.estoqueId) {
+      const item = estoque.find((e) => e.id === navState.estoqueId);
+      if (item) {
+        await updateEstoque(navState.estoqueId, {
+          qtdAtual: item.qtdAtual + quantidadeComprada,
+          ultimaCompra: new Date().toISOString(),
+        });
+      }
+    }
+
+    // Se veio da lista de compras manual, remove o item (já foi comprado)
+    if (navState?.listaId) {
+      await removeItemLista(navState.listaId);
+    }
+
     toast.success('Compra registrada!', {
       style: { background: '#131318', color: '#e4e1e9', border: '1px solid rgba(255,255,255,0.1)' },
     });
@@ -209,7 +255,7 @@ export default function NewPurchasePage() {
                   <p className="font-display font-semibold text-sm text-white">Item Essencial?</p>
                   <p className="text-[10px] text-white/40 font-label mt-0.5">Avisar se faltar no estoque</p>
                 </div>
-                <button type="button" onClick={() => setEssencial((p) => !p)}
+                <button type="button" onClick={handleEssencialManual}
                   className="relative rounded-full transition-all duration-300"
                   style={{
                     width: 52, height: 28,

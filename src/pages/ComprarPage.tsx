@@ -1,67 +1,65 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Check, X, ShoppingCart } from 'lucide-react';
+import { Plus, X, ShoppingCart, ArrowRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import SwipeableListItem from '../components/ui/SwipeableListItem';
 
-interface ManualItem {
-  id: string;
-  nome: string;
-  checked: boolean;
-}
+const toastStyle = { background: '#131318', color: '#e4e1e9', border: '1px solid rgba(255,255,255,0.1)' };
 
 export default function ComprarPage() {
   const navigate = useNavigate();
-  const { estoque } = useAppStore();
+  const { estoque, listaCompras, addItemLista, renameItemLista, removeItemLista } = useAppStore();
 
   const baixos = estoque.filter(
     (e) => (e.qtdMinima > 0 ? (e.qtdAtual / e.qtdMinima) * 100 : 100) <= 70
   );
 
-  const [checkedStockIds, setCheckedStockIds] = useState<Record<string, boolean>>({});
-  const [manualItems, setManualItems] = useState<ManualItem[]>([
-    { id: 'm-1', nome: 'Café', checked: false },
-    { id: 'm-2', nome: 'Açúcar', checked: false },
-  ]);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [newManualNome, setNewManualNome] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [nomeInput, setNomeInput] = useState('');
 
-  const toggleStockChecked = (id: string) => {
-    setCheckedStockIds((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
-
-  const toggleManualChecked = (id: string) => {
-    setManualItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, checked: !item.checked } : item))
-    );
-  };
-
-  const handleDeleteManual = (id: string) => {
-    setManualItems((prev) => prev.filter((item) => item.id !== id));
-    toast.success('Item removido da lista!', {
-      style: { background: '#131318', color: '#e4e1e9', border: '1px solid rgba(255,255,255,0.1)' },
+  // Tocar num item = "vou comprar isso agora" -> abre o registro já pré-preenchido.
+  // Isso fecha o ciclo de verdade: ao salvar a compra, o estoque é reposto (ou o item
+  // sai da lista manual) automaticamente — ver NewPurchasePage.
+  const comprarDoEstoque = (item: (typeof estoque)[number]) => {
+    navigate('/nova', {
+      state: {
+        produto: item.produto,
+        estoqueId: item.id,
+        quantidadeSugerida: Math.max(1, item.qtdMinima - item.qtdAtual),
+      },
     });
   };
 
-  const handleEditManual = (item: ManualItem) => {
-    setNewManualNome(item.nome);
-    setManualItems((prev) => prev.filter((i) => i.id !== item.id));
+  const comprarDaLista = (id: string, produto: string) => {
+    navigate('/nova', { state: { produto, listaId: id } });
+  };
+
+  const handleDeleteManual = async (id: string) => {
+    await removeItemLista(id);
+    toast.success('Item removido da lista!', { style: toastStyle });
+  };
+
+  const handleEditManual = (id: string, nomeAtual: string) => {
+    setEditingId(id);
+    setNomeInput(nomeAtual);
     setShowAddModal(true);
   };
 
-  const handleAddManualItem = () => {
-    if (!newManualNome.trim()) return;
-    setManualItems((prev) => [
-      ...prev,
-      { id: `manual-${Date.now()}`, nome: newManualNome.trim(), checked: false },
-    ]);
-    setNewManualNome('');
+  const handleAddManualItem = async () => {
+    if (!nomeInput.trim()) return;
+    if (editingId) {
+      await renameItemLista(editingId, nomeInput.trim());
+      toast.success('Item atualizado!', { style: toastStyle });
+    } else {
+      await addItemLista(nomeInput.trim());
+      toast.success('Item adicionado à lista!', { style: toastStyle });
+    }
+    setNomeInput('');
+    setEditingId(null);
     setShowAddModal(false);
-    toast.success('Item adicionado à lista!', {
-      style: { background: '#131318', color: '#e4e1e9', border: '1px solid rgba(255,255,255,0.1)' },
-    });
   };
 
   return (
@@ -71,11 +69,12 @@ export default function ComprarPage() {
         {/* Page Title */}
         <section className="pt-4">
           <h1 className="font-display font-bold text-3xl text-white">Minha Lista</h1>
+          <p className="text-xs text-white/40 font-body mt-1">Toque num item pra registrar a compra</p>
         </section>
 
         {/* Add Manually Button */}
         <button
-          onClick={() => { setNewManualNome(''); setShowAddModal(true); }}
+          onClick={() => { setEditingId(null); setNomeInput(''); setShowAddModal(true); }}
           className="w-full h-12 flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] text-[#39FF14] text-sm font-label hover:bg-white/[0.06] active:scale-[0.98] transition-all"
         >
           <Plus className="w-4 h-4" />
@@ -98,42 +97,24 @@ export default function ComprarPage() {
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              {baixos.map((item) => {
-                const isChecked = !!checkedStockIds[item.id];
-                return (
-                  <SwipeableListItem
-                    key={item.id}
-                    itemTitle={item.produto}
-                    onDelete={() => toggleStockChecked(item.id)}
-                    onEdit={() => navigate('/estoque')}
+              {baixos.map((item) => (
+                // Sem swipe pra excluir aqui: excluir estoque não faz sentido nessa tela.
+                // Swipe pra direita ainda leva pra editar o item direto no Estoque.
+                <SwipeableListItem key={item.id} itemTitle={item.produto} onEdit={() => navigate('/estoque')}>
+                  <div
+                    onClick={() => comprarDoEstoque(item)}
+                    className="rounded-2xl px-4 py-4 min-h-[64px] flex items-center justify-between border border-white/10 bg-white/[0.03] cursor-pointer hover:bg-white/[0.05] active:bg-white/[0.07] transition-colors"
                   >
-                    <div
-                      onClick={() => toggleStockChecked(item.id)}
-                      className="rounded-2xl px-4 py-4 min-h-[64px] flex items-center justify-between border border-white/10 bg-white/[0.03] cursor-pointer hover:bg-white/[0.05] active:bg-white/[0.07] transition-colors"
-                    >
-                      <div className="flex flex-col gap-0.5">
-                        <span className={`font-body text-sm text-white transition-all ${isChecked ? 'line-through opacity-40' : ''}`}>
-                          {item.produto}
-                        </span>
-                        <span className="text-[10px] text-white/40 font-label">
-                          Necessário: {Math.max(1, item.qtdMinima - item.qtdAtual)} {item.unidade}
-                        </span>
-                      </div>
-
-                      <div
-                        className="w-6 h-6 rounded-full border flex items-center justify-center transition-all duration-300 shrink-0"
-                        style={{
-                          borderColor: isChecked ? '#39FF14' : 'rgba(255,255,255,0.25)',
-                          background: isChecked ? 'rgba(57,255,20,0.15)' : 'transparent',
-                          boxShadow: isChecked ? '0 0 10px rgba(57,255,20,0.3)' : 'none',
-                        }}
-                      >
-                        {isChecked && <Check className="w-3.5 h-3.5 text-[#39FF14]" strokeWidth={3} />}
-                      </div>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-body text-sm text-white">{item.produto}</span>
+                      <span className="text-[10px] text-white/40 font-label">
+                        Necessário: {Math.max(1, item.qtdMinima - item.qtdAtual)} {item.unidade}
+                      </span>
                     </div>
-                  </SwipeableListItem>
-                );
-              })}
+                    <ArrowRight className="w-4 h-4 text-white/25 shrink-0" />
+                  </div>
+                </SwipeableListItem>
+              ))}
             </div>
           )}
         </section>
@@ -142,37 +123,25 @@ export default function ComprarPage() {
         <section className="flex flex-col gap-3">
           <h2 className="font-display font-semibold text-base text-white">Adicionados Manualmente</h2>
 
-          {manualItems.length === 0 ? (
+          {listaCompras.length === 0 ? (
             <div className="rounded-2xl p-5 text-center text-xs text-white/40 border border-white/10 bg-white/[0.03]">
               Nenhum item adicionado manualmente
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              {manualItems.map((item) => (
+              {listaCompras.map((item) => (
                 <SwipeableListItem
                   key={item.id}
-                  itemTitle={item.nome}
+                  itemTitle={item.produto}
                   onDelete={() => handleDeleteManual(item.id)}
-                  onEdit={() => handleEditManual(item)}
+                  onEdit={() => handleEditManual(item.id, item.produto)}
                 >
                   <div
-                    onClick={() => toggleManualChecked(item.id)}
+                    onClick={() => comprarDaLista(item.id, item.produto)}
                     className="rounded-2xl px-4 py-4 min-h-[64px] flex items-center justify-between border border-white/10 bg-white/[0.03] cursor-pointer hover:bg-white/[0.05] active:bg-white/[0.07] transition-colors"
                   >
-                    <span className={`font-body text-sm text-white transition-all ${item.checked ? 'line-through opacity-40' : ''}`}>
-                      {item.nome}
-                    </span>
-
-                    <div
-                      className="w-6 h-6 rounded-full border flex items-center justify-center transition-all duration-300 shrink-0"
-                      style={{
-                        borderColor: item.checked ? '#39FF14' : 'rgba(255,255,255,0.25)',
-                        background: item.checked ? 'rgba(57,255,20,0.15)' : 'transparent',
-                        boxShadow: item.checked ? '0 0 10px rgba(57,255,20,0.3)' : 'none',
-                      }}
-                    >
-                      {item.checked && <Check className="w-3.5 h-3.5 text-[#39FF14]" strokeWidth={3} />}
-                    </div>
+                    <span className="font-body text-sm text-white">{item.produto}</span>
+                    <ArrowRight className="w-4 h-4 text-white/25 shrink-0" />
                   </div>
                 </SwipeableListItem>
               ))}
@@ -232,8 +201,8 @@ export default function ComprarPage() {
                     className="w-full rounded-2xl px-4 py-4 text-white font-body text-base outline-none bg-white/[0.04] border border-white/10 focus:border-[#39FF14] focus:bg-white/[0.06] transition-all placeholder:text-white/25"
                     style={{ boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.2)' }}
                     placeholder="Ex: Café, Leite, Pão..."
-                    value={newManualNome}
-                    onChange={(e) => setNewManualNome(e.target.value)}
+                    value={nomeInput}
+                    onChange={(e) => setNomeInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleAddManualItem()}
                     autoFocus
                   />
@@ -247,7 +216,7 @@ export default function ComprarPage() {
                   }}
                   onClick={handleAddManualItem}
                 >
-                  <Plus className="w-5 h-5" /> Salvar Item
+                  <Plus className="w-5 h-5" /> {editingId ? 'Salvar Alteração' : 'Salvar Item'}
                 </button>
               </div>
             </motion.div>

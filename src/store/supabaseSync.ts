@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import type { Compra, Estoque, Meta, Categoria, Unidade } from '../types';
+import type { Compra, Estoque, Meta, Categoria, Unidade, ItemLista } from '../types';
 
 // ---------- Compras ----------
 
@@ -172,5 +172,51 @@ export async function fetchMercados(): Promise<string[]> {
 
 export async function insertMercado(nome: string): Promise<void> {
   const { error } = await supabase.from('mercados').insert({ nome });
+  if (error) throw error;
+}
+
+// ---------- Lista de Compras ----------
+
+type ItemListaRow = {
+  id: string;
+  produto: string;
+  comprado: boolean;
+};
+
+const rowToItemLista = (r: ItemListaRow): ItemLista => ({
+  id: r.id,
+  produto: r.produto,
+  comprado: r.comprado,
+});
+
+export async function fetchListaCompras(): Promise<ItemLista[]> {
+  const { data, error } = await supabase
+    .from('lista_compras')
+    .select('*')
+    .order('created_at', { ascending: true });
+  if (error) throw error;
+  return (data as ItemListaRow[]).map(rowToItemLista);
+}
+
+export async function insertItemLista(produto: string): Promise<ItemLista> {
+  const { data, error } = await supabase
+    .from('lista_compras')
+    .insert({ produto, comprado: false })
+    .select()
+    .single();
+  if (error) throw error;
+  return rowToItemLista(data as ItemListaRow);
+}
+
+export async function updateItemListaRow(id: string, patch: Partial<ItemLista>): Promise<void> {
+  const row: Record<string, unknown> = {};
+  if (patch.produto !== undefined) row.produto = patch.produto;
+  if (patch.comprado !== undefined) row.comprado = patch.comprado;
+  const { error } = await supabase.from('lista_compras').update(row).eq('id', id);
+  if (error) throw error;
+}
+
+export async function deleteItemListaRow(id: string): Promise<void> {
+  const { error } = await supabase.from('lista_compras').delete().eq('id', id);
   if (error) throw error;
 }

@@ -84,11 +84,12 @@ const KEYWORDS: Record<string, Categoria> = {
   alcool: 'Farmácia', pomada: 'Farmácia', termometro: 'Farmácia',
   mascara: 'Farmácia', vermifugo: 'Farmácia',
 
-  // Não Essencial
-  'refrigerante zero': 'Não Essencial', salgadinho: 'Não Essencial',
-  doce: 'Não Essencial', bala: 'Não Essencial', chiclete: 'Não Essencial',
-  sorvete: 'Não Essencial', cerveja: 'Não Essencial', vinho: 'Não Essencial',
-  chips: 'Não Essencial', energetico: 'Não Essencial', wafer: 'Não Essencial',
+  // Guloseimas / bebidas (categoria real: Alimentação — a distinção de supérfluo
+  // é feita pelo toggle Essencial, ver sugerirSuperfluo abaixo)
+  'refrigerante zero': 'Alimentação', salgadinho: 'Alimentação',
+  doce: 'Alimentação', bala: 'Alimentação', chiclete: 'Alimentação',
+  sorvete: 'Alimentação', cerveja: 'Alimentação', vinho: 'Alimentação',
+  chips: 'Alimentação', energetico: 'Alimentação', wafer: 'Alimentação',
 };
 
 /**
@@ -161,14 +162,40 @@ const MARCAS: Record<string, Categoria> = {
   dorflex: 'Farmácia', berocca: 'Farmácia', centrum: 'Farmácia',
   addera: 'Farmácia', epocler: 'Farmácia',
 
-  // Não Essencial
-  trident: 'Não Essencial', halls: 'Não Essencial', kitkat: 'Não Essencial',
-  'kit kat': 'Não Essencial', lacta: 'Não Essencial', garoto: 'Não Essencial',
-  doritos: 'Não Essencial', ruffles: 'Não Essencial', 'elma chips': 'Não Essencial',
-  cheetos: 'Não Essencial', skol: 'Não Essencial', brahma: 'Não Essencial',
-  heineken: 'Não Essencial', corona: 'Não Essencial', kibon: 'Não Essencial',
-  fini: 'Não Essencial', mentos: 'Não Essencial', 'tic tac': 'Não Essencial',
+  // Guloseimas / bebidas (categoria real: Alimentação)
+  trident: 'Alimentação', halls: 'Alimentação', kitkat: 'Alimentação',
+  'kit kat': 'Alimentação', lacta: 'Alimentação', garoto: 'Alimentação',
+  doritos: 'Alimentação', ruffles: 'Alimentação', 'elma chips': 'Alimentação',
+  cheetos: 'Alimentação', skol: 'Alimentação', brahma: 'Alimentação',
+  heineken: 'Alimentação', corona: 'Alimentação', kibon: 'Alimentação',
+  fini: 'Alimentação', mentos: 'Alimentação', 'tic tac': 'Alimentação',
 };
+
+/**
+ * Palavras-chave (produto ou marca) associadas a itens tipicamente supérfluos
+ * (guloseimas, bebida alcoólica, salgadinhos). Usado só pra SUGERIR o toggle
+ * Essencial/Supérfluo automaticamente — não é uma categoria separada, pra não
+ * duplicar o mesmo conceito de duas formas diferentes.
+ */
+const PALAVRAS_SUPERFLUO = [
+  'refrigerante', 'salgadinho', 'doce', 'bala', 'chiclete', 'sorvete',
+  'cerveja', 'vinho', 'chips', 'energetico', 'wafer', 'trident', 'halls',
+  'kitkat', 'kit kat', 'lacta', 'garoto', 'doritos', 'ruffles',
+  'elma chips', 'cheetos', 'skol', 'brahma', 'heineken', 'corona',
+  'kibon', 'fini', 'mentos', 'tic tac', 'biscoito', 'bolacha', 'chocolate',
+  'pipoca', 'achocolatado',
+];
+
+/**
+ * Sugere se um produto é tipicamente supérfluo (não essencial), pra pré-marcar
+ * o toggle Essencial/Supérfluo. Retorna false (supérfluo) ou null (sem sugestão —
+ * mantém o padrão essencial:true).
+ */
+export function sugerirSuperfluo(nomeProduto: string): boolean | null {
+  const nome = normalizar(nomeProduto);
+  if (nome.length < 3) return null;
+  return PALAVRAS_SUPERFLUO.some((p) => nome.includes(p)) ? false : null;
+}
 
 /**
  * Tenta detectar a categoria de um produto pelo nome digitado.

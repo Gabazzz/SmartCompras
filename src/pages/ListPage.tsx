@@ -10,7 +10,7 @@ import SwipeableListItem from '../components/ui/SwipeableListItem';
 
 const CATS: (Categoria | 'Todos')[] = [
   'Todos', 'Alimentação', 'Hortifruti', 'Laticínios', 'Carnes',
-  'Limpeza', 'Higiene', 'Farmácia', 'Não Essencial', 'Outros',
+  'Limpeza', 'Higiene', 'Farmácia', 'Outros',
 ];
 
 export default function ListPage() {
