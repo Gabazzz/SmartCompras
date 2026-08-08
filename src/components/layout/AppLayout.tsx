@@ -13,7 +13,7 @@ export default function AppLayout({ children, hideNav = false }: Props) {
     <div className="mobile-container">
       <div
         key={location.pathname}
-        style={{ flex: 1, overflow: 'hidden', position: 'relative' }}
+        style={{ flex: 1, minHeight: 0, overflow: 'hidden', position: 'relative' }}
       >
         {children}
       </div>

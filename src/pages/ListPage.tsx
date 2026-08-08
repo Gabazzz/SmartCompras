@@ -221,7 +221,7 @@ export default function ListPage() {
                             >
                               <div className="absolute top-0 left-0 w-[3px] h-full rounded-l-2xl" style={{ background: '#39FF14' }} />
 
-                              <div className="flex justify-between items-start pl-3 cursor-pointer" onClick={() => setExpandedId(null)}>
+                              <div className="flex justify-between items-start pl-4 cursor-pointer" onClick={() => setExpandedId(null)}>
                                 <div className="flex flex-col gap-0.5">
                                   <h4 className="font-display font-semibold text-base text-white">{compra.produto}</h4>
                                   <span className="text-xs text-white/40 font-label">{compra.categoria}</span>
@@ -235,7 +235,7 @@ export default function ListPage() {
                               </div>
 
                               <div
-                                className="mt-1 pt-3 flex justify-between items-center -mx-4 -mb-4 px-4 pb-3 rounded-b-2xl"
+                                className="mt-1 pt-3 flex justify-between items-center -mx-4 -mb-4 pl-7 pr-4 pb-3 rounded-b-2xl"
                                 style={{ background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.06)' }}
                               >
                                 <div className="flex gap-4">

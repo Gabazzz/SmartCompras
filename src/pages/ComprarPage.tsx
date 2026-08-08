@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Check, X } from 'lucide-react';
+import { Plus, Check, X, ShoppingCart } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
@@ -186,15 +186,19 @@ export default function ComprarPage() {
       <AnimatePresence>
         {showAddModal && (
           <motion.div
-            className="fixed inset-0 bg-black/75 z-[70] backdrop-blur-sm flex items-end justify-center"
+            className="fixed inset-0 bg-black/80 z-[70] backdrop-blur-md flex items-end justify-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowAddModal(false)}
           >
             <motion.div
-              className="w-full max-w-[480px] rounded-t-3xl p-6 pb-10 flex flex-col gap-5 z-[80]"
-              style={{ background: '#0D0F14', borderTop: '1px solid rgba(255,255,255,0.12)' }}
+              className="w-full max-w-[480px] rounded-t-[32px] p-6 pb-10 flex flex-col gap-6 z-[80]"
+              style={{
+                background: 'linear-gradient(180deg, rgba(24,26,32,0.98) 0%, #0A0A0F 100%)',
+                borderTop: '1px solid rgba(57,255,20,0.25)',
+                boxShadow: '0 -20px 60px rgba(57,255,20,0.08), 0 -1px 0 rgba(255,255,255,0.06) inset',
+              }}
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
@@ -204,18 +208,29 @@ export default function ComprarPage() {
               <div className="w-12 h-1 bg-white/15 rounded-full mx-auto -mt-1" />
 
               <div className="flex justify-between items-center">
-                <h3 className="font-display font-semibold text-xl text-white">Item da Lista</h3>
-                <button onClick={() => setShowAddModal(false)} className="w-8 h-8 rounded-full flex items-center justify-center text-white/40 hover:text-white">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                    style={{ background: 'rgba(57,255,20,0.12)', border: '1px solid rgba(57,255,20,0.3)', boxShadow: '0 0 16px rgba(57,255,20,0.15)' }}
+                  >
+                    <ShoppingCart className="w-4.5 h-4.5 text-[#39FF14]" />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-semibold text-xl text-white leading-tight">Item da Lista</h3>
+                    <p className="text-[11px] text-white/40 font-body">Adicione algo que precisa comprar</p>
+                  </div>
+                </div>
+                <button onClick={() => setShowAddModal(false)} className="w-8 h-8 rounded-full flex items-center justify-center text-white/40 hover:text-white hover:bg-white/5 transition-colors">
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs text-white/40 font-label">Nome do Item</label>
+                  <label className="text-[10px] text-white/40 uppercase tracking-widest font-label">Nome do Item</label>
                   <input
-                    className="rounded-xl p-3.5 text-white font-body text-base outline-none transition-colors"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
+                    className="w-full rounded-2xl px-4 py-4 text-white font-body text-base outline-none bg-white/[0.04] border border-white/10 focus:border-[#39FF14] focus:bg-white/[0.06] transition-all placeholder:text-white/25"
+                    style={{ boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.2)' }}
                     placeholder="Ex: Café, Leite, Pão..."
                     value={newManualNome}
                     onChange={(e) => setNewManualNome(e.target.value)}
@@ -225,8 +240,11 @@ export default function ComprarPage() {
                 </div>
 
                 <button
-                  className="w-full py-4 rounded-xl text-black font-display font-bold text-base flex items-center justify-center gap-2 active:scale-95 transition-all"
-                  style={{ background: '#39FF14', boxShadow: '0 0 24px rgba(57,255,20,0.4)' }}
+                  className="w-full py-4 rounded-2xl text-black font-display font-bold text-base flex items-center justify-center gap-2 active:scale-95 transition-all"
+                  style={{
+                    background: 'linear-gradient(135deg, #4dff2b 0%, #2ecc11 100%)',
+                    boxShadow: '0 8px 30px rgba(57,255,20,0.4), inset 0 1px 0 rgba(255,255,255,0.35)',
+                  }}
                   onClick={handleAddManualItem}
                 >
                   <Plus className="w-5 h-5" /> Salvar Item

@@ -292,15 +292,19 @@ export default function StockPage() {
       <AnimatePresence>
         {showAdd && (
           <motion.div
-            className="fixed inset-0 bg-black/75 z-[70] backdrop-blur-sm flex items-end justify-center"
+            className="fixed inset-0 bg-black/80 z-[70] backdrop-blur-md flex items-end justify-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowAdd(false)}
           >
             <motion.div
-              className="w-full max-w-[480px] rounded-t-3xl p-6 pb-10 flex flex-col gap-5 max-h-[85vh] overflow-y-auto z-[80]"
-              style={{ background: '#0D0F14', borderTop: '1px solid rgba(255,255,255,0.12)' }}
+              className="w-full max-w-[480px] rounded-t-[32px] p-6 pb-10 flex flex-col gap-6 max-h-[85vh] overflow-y-auto z-[80]"
+              style={{
+                background: 'linear-gradient(180deg, rgba(24,26,32,0.98) 0%, #0A0A0F 100%)',
+                borderTop: '1px solid rgba(57,255,20,0.25)',
+                boxShadow: '0 -20px 60px rgba(57,255,20,0.08), 0 -1px 0 rgba(255,255,255,0.06) inset',
+              }}
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
@@ -309,17 +313,28 @@ export default function StockPage() {
             >
               <div className="w-12 h-1 bg-white/15 rounded-full mx-auto -mt-1" />
               <div className="flex justify-between items-center">
-                <h3 className="font-display font-semibold text-xl text-white">Novo Item no Estoque</h3>
-                <button onClick={() => setShowAdd(false)} className="w-8 h-8 rounded-full flex items-center justify-center text-white/40 hover:text-white">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                    style={{ background: 'rgba(57,255,20,0.12)', border: '1px solid rgba(57,255,20,0.3)', boxShadow: '0 0 16px rgba(57,255,20,0.15)' }}
+                  >
+                    <Plus className="w-4.5 h-4.5 text-[#39FF14]" />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-semibold text-xl text-white leading-tight">Novo Item no Estoque</h3>
+                    <p className="text-[11px] text-white/40 font-body">Cadastre um produto pra monitorar</p>
+                  </div>
+                </div>
+                <button onClick={() => setShowAdd(false)} className="w-8 h-8 rounded-full flex items-center justify-center text-white/40 hover:text-white hover:bg-white/5 transition-colors">
                   <X className="w-5 h-5" />
                 </button>
               </div>
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs text-white/40 font-label">Nome do Produto</label>
+                  <label className="text-[10px] text-white/40 uppercase tracking-widest font-label">Nome do Produto</label>
                   <input
-                    className="rounded-xl p-3.5 text-white font-body text-base outline-none"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
+                    className="w-full rounded-2xl px-4 py-4 text-white font-body text-base outline-none bg-white/[0.04] border border-white/10 focus:border-[#39FF14] focus:bg-white/[0.06] transition-all placeholder:text-white/25"
+                    style={{ boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.2)' }}
                     placeholder="Ex: Arroz, Detergente..."
                     value={newProduto}
                     onChange={(e) => setNewProduto(e.target.value)}
@@ -332,10 +347,10 @@ export default function StockPage() {
                     { label: 'Qtd. Mínima', value: newQtdMin, set: setNewQtdMin },
                   ].map(({ label, value, set }) => (
                     <div key={label} className="flex flex-col gap-2">
-                      <label className="text-xs text-white/40 font-label">{label}</label>
+                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-label">{label}</label>
                       <input
-                        className="rounded-xl p-3 text-white font-display font-semibold text-center outline-none"
-                        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
+                        className="w-full rounded-2xl p-3 text-white font-display font-semibold text-center outline-none bg-white/[0.04] border border-white/10 focus:border-[#39FF14] focus:bg-white/[0.06] transition-all"
+                        style={{ boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.2)' }}
                         value={value}
                         onChange={(e) => set(e.target.value)}
                         inputMode="decimal"
@@ -343,12 +358,11 @@ export default function StockPage() {
                     </div>
                   ))}
                   <div className="flex flex-col gap-2">
-                    <label className="text-xs text-white/40 font-label">Unidade</label>
+                    <label className="text-[10px] text-white/40 uppercase tracking-widest font-label">Unidade</label>
                     <select
                       value={newUnidade}
                       onChange={(e) => setNewUnidade(e.target.value as Unidade)}
-                      className="rounded-xl p-3 text-white font-body text-sm outline-none"
-                      style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
+                      className="w-full rounded-2xl p-3 text-white font-body text-sm outline-none bg-white/[0.04] border border-white/10 focus:border-[#39FF14] transition-all"
                     >
                       {UNIDADES.map((u) => (
                         <option key={u} value={u} style={{ background: '#131318' }}>{u}</option>
@@ -357,8 +371,11 @@ export default function StockPage() {
                   </div>
                 </div>
                 <button
-                  className="w-full py-4 rounded-xl text-black font-display font-bold flex items-center justify-center gap-2 active:scale-95 transition-all"
-                  style={{ background: '#39FF14', boxShadow: '0 0 20px rgba(57,255,20,0.4)' }}
+                  className="w-full py-4 rounded-2xl text-black font-display font-bold flex items-center justify-center gap-2 active:scale-95 transition-all"
+                  style={{
+                    background: 'linear-gradient(135deg, #4dff2b 0%, #2ecc11 100%)',
+                    boxShadow: '0 8px 30px rgba(57,255,20,0.4), inset 0 1px 0 rgba(255,255,255,0.35)',
+                  }}
                   onClick={handleAddEstoque}
                 >
                   <Plus className="w-5 h-5" /> Adicionar ao Estoque
