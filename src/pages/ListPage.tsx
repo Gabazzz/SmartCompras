@@ -6,6 +6,7 @@ import { ptBR } from 'date-fns/locale';
 import toast from 'react-hot-toast';
 import { useAppStore } from '../store/useAppStore';
 import { CATEGORIA_EMOJI, type Categoria } from '../types';
+import SwipeableListItem from '../components/ui/SwipeableListItem';
 
 const CATS: (Categoria | 'Todos')[] = [
   'Todos', 'Alimentação', 'Hortifruti', 'Laticínios', 'Carnes',
@@ -199,104 +200,110 @@ export default function ListPage() {
                   {items.map((compra, idx) => {
                     const expanded = expandedId === compra.id;
                     return (
-                      <motion.div
+                      <SwipeableListItem
                         key={compra.id}
-                        initial={{ opacity: 0, y: 6 }}
-                        animate={{ opacity: 1, y: 0, transition: { delay: idx * 0.04 } }}
+                        itemTitle={compra.produto}
+                        onDelete={() => handleDelete(compra.id, compra.produto)}
+                        onEdit={() => setExpandedId(expanded ? null : compra.id)}
                       >
-                        {expanded ? (
-                          <div
-                            className="rounded-2xl p-4 flex flex-col gap-3 relative overflow-hidden"
-                            style={{
-                              background: 'rgba(255,255,255,0.04)',
-                              border: '1px solid rgba(57,255,20,0.2)',
-                              boxShadow: '0 0 10px rgba(57,255,20,0.05)',
-                            }}
-                          >
-                            <div className="absolute top-0 left-0 w-[3px] h-full rounded-l-2xl" style={{ background: '#39FF14' }} />
+                        <motion.div
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0, transition: { delay: idx * 0.04 } }}
+                        >
+                          {expanded ? (
+                            <div
+                              className="rounded-2xl p-4 flex flex-col gap-3 relative overflow-hidden"
+                              style={{
+                                background: 'rgba(255,255,255,0.04)',
+                                border: '1px solid rgba(57,255,20,0.2)',
+                                boxShadow: '0 0 10px rgba(57,255,20,0.05)',
+                              }}
+                            >
+                              <div className="absolute top-0 left-0 w-[3px] h-full rounded-l-2xl" style={{ background: '#39FF14' }} />
 
-                            <div className="flex justify-between items-start pl-3 cursor-pointer" onClick={() => setExpandedId(null)}>
-                              <div className="flex flex-col gap-0.5">
-                                <h4 className="font-display font-semibold text-base text-white">{compra.produto}</h4>
-                                <div className="flex items-center gap-1.5 text-xs text-white/40 font-label">
-                                  <Store className="w-3 h-3" />
-                                  <span>{compra.mercado}</span>
+                              <div className="flex justify-between items-start pl-3 cursor-pointer" onClick={() => setExpandedId(null)}>
+                                <div className="flex flex-col gap-0.5">
+                                  <h4 className="font-display font-semibold text-base text-white">{compra.produto}</h4>
+                                  <div className="flex items-center gap-1.5 text-xs text-white/40 font-label">
+                                    <Store className="w-3 h-3" />
+                                    <span>{compra.mercado}</span>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-display font-bold text-base text-[#39FF14]">
+                                    {compra.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                  </span>
+                                  <ChevronUp className="w-4 h-4 text-white/30" />
                                 </div>
                               </div>
-                              <div className="flex items-center gap-2">
-                                <span className="font-display font-bold text-base text-[#39FF14]">
-                                  {compra.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                                </span>
-                                <ChevronUp className="w-4 h-4 text-white/30" />
+
+                              <div
+                                className="mt-1 pt-3 flex justify-between items-center -mx-4 -mb-4 px-4 pb-3 rounded-b-2xl"
+                                style={{ background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.06)' }}
+                              >
+                                <div className="flex gap-4">
+                                  <div className="flex flex-col">
+                                    <span className="text-[9px] text-white/30 uppercase font-label">Qtd</span>
+                                    <span className="text-xs text-white font-body">{compra.quantidade} {compra.unidade}</span>
+                                  </div>
+                                  <div className="flex flex-col">
+                                    <span className="text-[9px] text-white/30 uppercase font-label">Valor Unit.</span>
+                                    <span className="text-xs text-white font-body">
+                                      {compra.valorUni.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className="px-2.5 py-0.5 rounded text-[9px] font-label uppercase tracking-wider"
+                                    style={compra.essencial ? {
+                                      background: 'rgba(57,255,20,0.08)',
+                                      color: '#39FF14',
+                                      border: '1px solid rgba(57,255,20,0.2)',
+                                    } : {
+                                      background: 'rgba(255,49,49,0.08)',
+                                      color: '#FF3131',
+                                      border: '1px solid rgba(255,49,49,0.2)',
+                                    }}
+                                  >
+                                    {compra.essencial ? 'Essencial' : 'Supérfluo'}
+                                  </span>
+                                  <button
+                                    className="p-1.5 rounded-lg transition-colors text-[#FF3131] hover:bg-[#FF3131]/10"
+                                    onClick={(e) => { e.stopPropagation(); handleDelete(compra.id, compra.produto); }}
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
                               </div>
                             </div>
-
+                          ) : (
                             <div
-                              className="mt-1 pt-3 flex justify-between items-center -mx-4 -mb-4 px-4 pb-3 rounded-b-2xl"
-                              style={{ background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.06)' }}
+                              className="rounded-2xl p-4 flex justify-between items-center cursor-pointer hover:bg-white/[0.04] active:scale-[0.98] transition-all"
+                              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
+                              onClick={() => setExpandedId(compra.id)}
                             >
-                              <div className="flex gap-4">
-                                <div className="flex flex-col">
-                                  <span className="text-[9px] text-white/30 uppercase font-label">Qtd</span>
-                                  <span className="text-xs text-white font-body">{compra.quantidade} {compra.unidade}</span>
-                                </div>
-                                <div className="flex flex-col">
-                                  <span className="text-[9px] text-white/30 uppercase font-label">Valor Unit.</span>
-                                  <span className="text-xs text-white font-body">
-                                    {compra.valorUni.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                              <div className="flex flex-col gap-1">
+                                <h4 className="font-body font-medium text-sm text-white">{compra.produto}</h4>
+                                <div className="flex items-center gap-2 text-xs text-white/40 font-label">
+                                  <Store className="w-3 h-3" />
+                                  <span>{compra.mercado}</span>
+                                  <span className="w-1 h-1 rounded-full bg-white/20" />
+                                  <span style={{ color: compra.essencial ? '#39FF14' : '#FF3131' }}>
+                                    {compra.essencial ? 'Essencial' : 'Supérfluo'}
                                   </span>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">
-                                <span
-                                  className="px-2.5 py-0.5 rounded text-[9px] font-label uppercase tracking-wider"
-                                  style={compra.essencial ? {
-                                    background: 'rgba(57,255,20,0.08)',
-                                    color: '#39FF14',
-                                    border: '1px solid rgba(57,255,20,0.2)',
-                                  } : {
-                                    background: 'rgba(255,49,49,0.08)',
-                                    color: '#FF3131',
-                                    border: '1px solid rgba(255,49,49,0.2)',
-                                  }}
-                                >
-                                  {compra.essencial ? 'Essencial' : 'Supérfluo'}
+                                <span className="font-display font-semibold text-sm text-white">
+                                  {compra.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                 </span>
-                                <button
-                                  className="p-1.5 rounded-lg transition-colors text-[#FF3131] hover:bg-[#FF3131]/10"
-                                  onClick={(e) => { e.stopPropagation(); handleDelete(compra.id, compra.produto); }}
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
+                                <ChevronDown className="w-4 h-4 text-white/30" />
                               </div>
                             </div>
-                          </div>
-                        ) : (
-                          <div
-                            className="rounded-2xl p-4 flex justify-between items-center cursor-pointer hover:bg-white/[0.04] active:scale-[0.98] transition-all"
-                            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
-                            onClick={() => setExpandedId(compra.id)}
-                          >
-                            <div className="flex flex-col gap-1">
-                              <h4 className="font-body font-medium text-sm text-white">{compra.produto}</h4>
-                              <div className="flex items-center gap-2 text-xs text-white/40 font-label">
-                                <Store className="w-3 h-3" />
-                                <span>{compra.mercado}</span>
-                                <span className="w-1 h-1 rounded-full bg-white/20" />
-                                <span style={{ color: compra.essencial ? '#39FF14' : '#FF3131' }}>
-                                  {compra.essencial ? 'Essencial' : 'Supérfluo'}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-display font-semibold text-sm text-white">
-                                {compra.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                              </span>
-                              <ChevronDown className="w-4 h-4 text-white/30" />
-                            </div>
-                          </div>
-                        )}
-                      </motion.div>
+                          )}
+                        </motion.div>
+                      </SwipeableListItem>
                     );
                   })}
                 </div>

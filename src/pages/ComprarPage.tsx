@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Check, X } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
+import SwipeableListItem from '../components/ui/SwipeableListItem';
 
 interface ManualItem {
   id: string;
@@ -11,6 +13,7 @@ interface ManualItem {
 }
 
 export default function ComprarPage() {
+  const navigate = useNavigate();
   const { estoque } = useAppStore();
 
   const baixos = estoque.filter(
@@ -33,6 +36,19 @@ export default function ComprarPage() {
     setManualItems((prev) =>
       prev.map((item) => (item.id === id ? { ...item, checked: !item.checked } : item))
     );
+  };
+
+  const handleDeleteManual = (id: string) => {
+    setManualItems((prev) => prev.filter((item) => item.id !== id));
+    toast.success('Item removido da lista!', {
+      style: { background: '#131318', color: '#e4e1e9', border: '1px solid rgba(255,255,255,0.1)' },
+    });
+  };
+
+  const handleEditManual = (item: ManualItem) => {
+    setNewManualNome(item.nome);
+    setManualItems((prev) => prev.filter((i) => i.id !== item.id));
+    setShowAddModal(true);
   };
 
   const handleAddManualItem = () => {
@@ -59,7 +75,7 @@ export default function ComprarPage() {
 
         {/* Add Manually Button */}
         <button
-          onClick={() => setShowAddModal(true)}
+          onClick={() => { setNewManualNome(''); setShowAddModal(true); }}
           className="w-full h-12 flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] text-[#39FF14] text-sm font-label hover:bg-white/[0.06] active:scale-[0.98] transition-all"
         >
           <Plus className="w-4 h-4" />
@@ -81,36 +97,41 @@ export default function ComprarPage() {
               Nenhum item com estoque baixo 🎉
             </div>
           ) : (
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] overflow-hidden">
-              {baixos.map((item, idx) => {
+            <div className="flex flex-col gap-2">
+              {baixos.map((item) => {
                 const isChecked = !!checkedStockIds[item.id];
-                const isLast = idx === baixos.length - 1;
                 return (
-                  <div
+                  <SwipeableListItem
                     key={item.id}
-                    onClick={() => toggleStockChecked(item.id)}
-                    className={`flex items-center justify-between px-4 py-4 min-h-[64px] cursor-pointer hover:bg-white/[0.03] active:bg-white/[0.05] transition-colors ${!isLast ? 'border-b border-white/[0.06]' : ''}`}
+                    itemTitle={item.produto}
+                    onDelete={() => toggleStockChecked(item.id)}
+                    onEdit={() => navigate('/estoque')}
                   >
-                    <div className="flex flex-col gap-0.5">
-                      <span className={`font-body text-sm text-white transition-all ${isChecked ? 'line-through opacity-40' : ''}`}>
-                        {item.produto}
-                      </span>
-                      <span className="text-[10px] text-white/40 font-label">
-                        Necessário: {Math.max(1, item.qtdMinima - item.qtdAtual)} {item.unidade}
-                      </span>
-                    </div>
-
                     <div
-                      className="w-6 h-6 rounded-full border flex items-center justify-center transition-all duration-300 shrink-0"
-                      style={{
-                        borderColor: isChecked ? '#39FF14' : 'rgba(255,255,255,0.25)',
-                        background: isChecked ? 'rgba(57,255,20,0.15)' : 'transparent',
-                        boxShadow: isChecked ? '0 0 10px rgba(57,255,20,0.3)' : 'none',
-                      }}
+                      onClick={() => toggleStockChecked(item.id)}
+                      className="rounded-2xl px-4 py-4 min-h-[64px] flex items-center justify-between border border-white/10 bg-white/[0.03] cursor-pointer hover:bg-white/[0.05] active:bg-white/[0.07] transition-colors"
                     >
-                      {isChecked && <Check className="w-3.5 h-3.5 text-[#39FF14]" strokeWidth={3} />}
+                      <div className="flex flex-col gap-0.5">
+                        <span className={`font-body text-sm text-white transition-all ${isChecked ? 'line-through opacity-40' : ''}`}>
+                          {item.produto}
+                        </span>
+                        <span className="text-[10px] text-white/40 font-label">
+                          Necessário: {Math.max(1, item.qtdMinima - item.qtdAtual)} {item.unidade}
+                        </span>
+                      </div>
+
+                      <div
+                        className="w-6 h-6 rounded-full border flex items-center justify-center transition-all duration-300 shrink-0"
+                        style={{
+                          borderColor: isChecked ? '#39FF14' : 'rgba(255,255,255,0.25)',
+                          background: isChecked ? 'rgba(57,255,20,0.15)' : 'transparent',
+                          boxShadow: isChecked ? '0 0 10px rgba(57,255,20,0.3)' : 'none',
+                        }}
+                      >
+                        {isChecked && <Check className="w-3.5 h-3.5 text-[#39FF14]" strokeWidth={3} />}
+                      </div>
                     </div>
-                  </div>
+                  </SwipeableListItem>
                 );
               })}
             </div>
@@ -126,14 +147,17 @@ export default function ComprarPage() {
               Nenhum item adicionado manualmente
             </div>
           ) : (
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] overflow-hidden">
-              {manualItems.map((item, idx) => {
-                const isLast = idx === manualItems.length - 1;
-                return (
+            <div className="flex flex-col gap-2">
+              {manualItems.map((item) => (
+                <SwipeableListItem
+                  key={item.id}
+                  itemTitle={item.nome}
+                  onDelete={() => handleDeleteManual(item.id)}
+                  onEdit={() => handleEditManual(item)}
+                >
                   <div
-                    key={item.id}
                     onClick={() => toggleManualChecked(item.id)}
-                    className={`flex items-center justify-between px-4 py-4 min-h-[64px] cursor-pointer hover:bg-white/[0.03] active:bg-white/[0.05] transition-colors ${!isLast ? 'border-b border-white/[0.06]' : ''}`}
+                    className="rounded-2xl px-4 py-4 min-h-[64px] flex items-center justify-between border border-white/10 bg-white/[0.03] cursor-pointer hover:bg-white/[0.05] active:bg-white/[0.07] transition-colors"
                   >
                     <span className={`font-body text-sm text-white transition-all ${item.checked ? 'line-through opacity-40' : ''}`}>
                       {item.nome}
@@ -150,15 +174,15 @@ export default function ComprarPage() {
                       {item.checked && <Check className="w-3.5 h-3.5 text-[#39FF14]" strokeWidth={3} />}
                     </div>
                   </div>
-                );
-              })}
+                </SwipeableListItem>
+              ))}
             </div>
           )}
         </section>
 
       </div>
 
-      {/* Modal Adicionar Item */}
+      {/* Modal Adicionar/Editar Item */}
       <AnimatePresence>
         {showAddModal && (
           <motion.div
@@ -180,7 +204,7 @@ export default function ComprarPage() {
               <div className="w-12 h-1 bg-white/15 rounded-full mx-auto -mt-1" />
 
               <div className="flex justify-between items-center">
-                <h3 className="font-display font-semibold text-xl text-white">Adicionar à Lista</h3>
+                <h3 className="font-display font-semibold text-xl text-white">Item da Lista</h3>
                 <button onClick={() => setShowAddModal(false)} className="w-8 h-8 rounded-full flex items-center justify-center text-white/40 hover:text-white">
                   <X className="w-5 h-5" />
                 </button>
@@ -205,7 +229,7 @@ export default function ComprarPage() {
                   style={{ background: '#39FF14', boxShadow: '0 0 24px rgba(57,255,20,0.4)' }}
                   onClick={handleAddManualItem}
                 >
-                  <Plus className="w-5 h-5" /> Adicionar
+                  <Plus className="w-5 h-5" /> Salvar Item
                 </button>
               </div>
             </motion.div>

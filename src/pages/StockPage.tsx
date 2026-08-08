@@ -4,6 +4,7 @@ import { Plus, ShoppingCart, X, Check, Trash2, AlertTriangle } from 'lucide-reac
 import toast from 'react-hot-toast';
 import { useAppStore } from '../store/useAppStore';
 import type { Estoque, Unidade } from '../types';
+import SwipeableListItem from '../components/ui/SwipeableListItem';
 
 const UNIDADES: Unidade[] = ['un', 'kg', 'g', 'L', 'mL', 'cx', 'pct'];
 
@@ -19,11 +20,13 @@ function Section({
   items,
   type,
   onEdit,
+  onDelete,
 }: {
   title: string;
   items: Estoque[];
   type: 'critico' | 'baixo' | 'ok';
   onEdit: (id: string) => void;
+  onDelete: (id: string, name: string) => void;
 }) {
   if (items.length === 0) return null;
 
@@ -45,26 +48,32 @@ function Section({
           const perc = item.qtdMinima > 0 ? Math.round((item.qtdAtual / item.qtdMinima) * 100) : 100;
           const clamped = Math.min(Math.max(perc, 0), 100);
           return (
-            <div
+            <SwipeableListItem
               key={item.id}
-              className={`rounded-2xl p-4 flex flex-col gap-3 cursor-pointer hover:bg-white/[0.04] active:scale-[0.98] transition-all bg-white/[0.03] ${cardBorder}`}
-              onClick={() => onEdit(item.id)}
+              itemTitle={item.produto}
+              onDelete={() => onDelete(item.id, item.produto)}
+              onEdit={() => onEdit(item.id)}
             >
-              <div className="flex justify-between items-center">
-                <span className="font-body font-semibold text-sm text-white">{item.produto}</span>
-                <span className="font-display text-sm font-bold" style={{ color: percColor }}>{perc}%</span>
+              <div
+                className={`rounded-2xl p-4 flex flex-col gap-3 cursor-pointer hover:bg-white/[0.04] active:scale-[0.98] transition-all bg-white/[0.03] ${cardBorder}`}
+                onClick={() => onEdit(item.id)}
+              >
+                <div className="flex justify-between items-center">
+                  <span className="font-body font-semibold text-sm text-white">{item.produto}</span>
+                  <span className="font-display text-sm font-bold" style={{ color: percColor }}>{perc}%</span>
+                </div>
+                <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{ width: `${clamped}%`, background: percColor, boxShadow: `0 0 6px ${percColor}` }}
+                  />
+                </div>
+                <div className="flex justify-between text-[10px] text-white/40 font-label">
+                  <span>Atual: {item.qtdAtual}{item.unidade}</span>
+                  <span>Mín: {item.qtdMinima}{item.unidade}</span>
+                </div>
               </div>
-              <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
-                <div
-                  className="h-full rounded-full transition-all duration-500"
-                  style={{ width: `${clamped}%`, background: percColor, boxShadow: `0 0 6px ${percColor}` }}
-                />
-              </div>
-              <div className="flex justify-between text-[10px] text-white/40 font-label">
-                <span>Atual: {item.qtdAtual}{item.unidade}</span>
-                <span>Mín: {item.qtdMinima}{item.unidade}</span>
-              </div>
-            </div>
+            </SwipeableListItem>
           );
         })}
       </div>
@@ -97,6 +106,13 @@ export default function StockPage() {
       setEditMin(String(item.qtdMinima));
       setSelectedId(id);
     }
+  };
+
+  const handleDeleteItem = (id: string, name: string) => {
+    deleteEstoque(id);
+    toast.success(`${name} removido do estoque!`, {
+      style: { background: '#131318', color: '#e4e1e9', border: '1px solid rgba(255,255,255,0.1)' },
+    });
   };
 
   const saveEdit = () => {
@@ -188,9 +204,9 @@ export default function StockPage() {
           </div>
         ) : (
           <div className="flex flex-col gap-6">
-            <Section title="Crítico" items={criticos} type="critico" onEdit={openEdit} />
-            <Section title="Atenção" items={baixos} type="baixo" onEdit={openEdit} />
-            <Section title="OK" items={oks} type="ok" onEdit={openEdit} />
+            <Section title="Crítico" items={criticos} type="critico" onEdit={openEdit} onDelete={handleDeleteItem} />
+            <Section title="Atenção" items={baixos} type="baixo" onEdit={openEdit} onDelete={handleDeleteItem} />
+            <Section title="OK" items={oks} type="ok" onEdit={openEdit} onDelete={handleDeleteItem} />
           </div>
         )}
 

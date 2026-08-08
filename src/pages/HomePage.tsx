@@ -5,6 +5,7 @@ import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
+import SwipeableListItem from '../components/ui/SwipeableListItem';
 
 const staggerItem = (i: number) => ({
   initial: { opacity: 0, y: 12 },
@@ -23,6 +24,7 @@ export default function HomePage() {
     meta,
     setMeta,
     estoque,
+    deleteCompra,
   } = useAppStore();
 
   const [editingMeta, setEditingMeta] = useState(false);
@@ -174,27 +176,33 @@ export default function HomePage() {
           ) : (
             <div className="flex flex-col gap-2">
               {ultimas.map((compra, i) => (
-                <motion.div
+                <SwipeableListItem
                   key={compra.id}
-                  {...staggerItem(i)}
-                  className="rounded-2xl p-3.5 flex justify-between items-center border border-white/8 bg-white/[0.03] cursor-pointer hover:bg-white/[0.06] transition-colors active:scale-[0.98]"
-                  onClick={() => navigate('/lista')}
+                  itemTitle={compra.produto}
+                  onDelete={() => deleteCompra(compra.id)}
+                  onEdit={() => navigate('/lista')}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center shrink-0">
-                      <Receipt className="w-4 h-4 text-white/30" />
+                  <motion.div
+                    {...staggerItem(i)}
+                    className="rounded-2xl p-3.5 flex justify-between items-center border border-white/8 bg-white/[0.03] cursor-pointer hover:bg-white/[0.06] transition-colors active:scale-[0.98]"
+                    onClick={() => navigate('/lista')}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center shrink-0">
+                        <Receipt className="w-4 h-4 text-white/30" />
+                      </div>
+                      <div>
+                        <p className="font-body font-medium text-sm text-white">{compra.produto}</p>
+                        <p className="text-[10px] text-white/40 font-label">
+                          {format(parseISO(compra.data), 'dd MMM', { locale: ptBR })}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-body font-medium text-sm text-white">{compra.produto}</p>
-                      <p className="text-[10px] text-white/40 font-label">
-                        {format(parseISO(compra.data), 'dd MMM', { locale: ptBR })}
-                      </p>
-                    </div>
-                  </div>
-                  <span className="font-display font-semibold text-sm text-white">
-                    {compra.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                  </span>
-                </motion.div>
+                    <span className="font-display font-semibold text-sm text-white">
+                      {compra.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                    </span>
+                  </motion.div>
+                </SwipeableListItem>
               ))}
             </div>
           )}
