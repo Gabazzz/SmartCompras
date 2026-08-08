@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Compra, Estoque, Meta, Categoria } from '../types';
-import { SEED_COMPRAS, SEED_ESTOQUE } from './seedData';
+import { SEED_COMPRAS, SEED_ESTOQUE, COMPRAS_JULHO } from './seedData';
 import { format, isSameMonth, parseISO } from 'date-fns';
 
 interface AppState {
@@ -164,7 +164,7 @@ export const useAppStore = create<AppState>()(
       name: 'minu-storage',
       onRehydrateStorage: () => (state) => {
         if (state && !state.seeded) {
-          state.compras = SEED_COMPRAS;
+          state.compras = [...COMPRAS_JULHO, ...SEED_COMPRAS];
           state.estoque = SEED_ESTOQUE;
           state.seeded = true;
         }

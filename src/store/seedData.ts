@@ -190,6 +190,56 @@ export const SEED_COMPRAS: Compra[] = [
   },
 ];
 
+// Compras registradas a partir do cupom fiscal de julho/2026
+const dataJulho = '2026-07-20T14:00:00.000Z';
+const mercadoJulho = 'Atacadão';
+
+export const COMPRAS_JULHO: Compra[] = [
+  { id: 'jul-1', produto: 'Lav. roupa líquido OMO 1,4L', categoria: 'Limpeza', essencial: true, quantidade: 1, unidade: 'un', valorUni: 28.38, valorTotal: 28.38, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-2', produto: 'Lav. roupa líquido OMO AC TOT 1,4L', categoria: 'Limpeza', essencial: true, quantidade: 1, unidade: 'un', valorUni: 28.38, valorTotal: 28.38, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-3', produto: "Sacola camiseta verde 58x70", categoria: 'Outros', essencial: false, quantidade: 4, unidade: 'un', valorUni: 0.30, valorTotal: 1.20, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-4', produto: "Água sanitária Q'Boa 1L", categoria: 'Limpeza', essencial: true, quantidade: 1, unidade: 'un', valorUni: 3.29, valorTotal: 3.29, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-5', produto: 'Detergente líquido Brilux 500ml Cristal', categoria: 'Limpeza', essencial: true, quantidade: 1, unidade: 'un', valorUni: 2.19, valorTotal: 2.19, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-6', produto: 'Detergente líquido Brilux Vinagre 500ml', categoria: 'Limpeza', essencial: true, quantidade: 3, unidade: 'un', valorUni: 2.49, valorTotal: 7.47, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-7', produto: 'Limpador perfumado Ypê/Lil 500ml Flor Vera', categoria: 'Limpeza', essencial: true, quantidade: 1, unidade: 'un', valorUni: 9.49, valorTotal: 9.49, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-8', produto: 'Esponja Brilhus N Risca 3un', categoria: 'Limpeza', essencial: true, quantidade: 1, unidade: 'un', valorUni: 4.25, valorTotal: 4.25, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-9', produto: 'Esponja Brilhus N Risca 3un', categoria: 'Limpeza', essencial: true, quantidade: 1, unidade: 'un', valorUni: 4.25, valorTotal: 4.25, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-10', produto: 'Sabonete em barra Palmolive 150g Tang E Al', categoria: 'Higiene', essencial: true, quantidade: 1, unidade: 'un', valorUni: 3.46, valorTotal: 3.46, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-11', produto: 'Sabonete em barra Palmolive 150g Turmalina', categoria: 'Higiene', essencial: true, quantidade: 1, unidade: 'un', valorUni: 3.46, valorTotal: 3.46, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-12', produto: 'Sabonete em barra Palmolive 150g Algodão', categoria: 'Higiene', essencial: true, quantidade: 1, unidade: 'un', valorUni: 3.46, valorTotal: 3.46, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-13', produto: 'Creme dental Colgate TP AC 180g', categoria: 'Higiene', essencial: true, quantidade: 1, unidade: 'un', valorUni: 8.49, valorTotal: 8.49, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-14', produto: 'Sabonete líquido Protex 200ml Delic Care', categoria: 'Higiene', essencial: true, quantidade: 1, unidade: 'un', valorUni: 24.59, valorTotal: 24.59, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-15', produto: 'Esponja de aço Bombril 60g', categoria: 'Limpeza', essencial: true, quantidade: 1, unidade: 'un', valorUni: 2.25, valorTotal: 2.25, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-16', produto: 'Fubá de milho Coringa 500g', categoria: 'Alimentação', essencial: true, quantidade: 1, unidade: 'un', valorUni: 2.25, valorTotal: 2.25, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-17', produto: 'Arroz Branco Tipo 1 Urbano 1kg', categoria: 'Alimentação', essencial: true, quantidade: 1, unidade: 'un', valorUni: 4.98, valorTotal: 4.98, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-18', produto: 'Flocão de milho Maratá 500g', categoria: 'Alimentação', essencial: true, quantidade: 2, unidade: 'un', valorUni: 1.75, valorTotal: 3.50, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-19', produto: 'Farinha de trigo Finna 1kg', categoria: 'Alimentação', essencial: true, quantidade: 2, unidade: 'un', valorUni: 4.49, valorTotal: 8.98, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-20', produto: "Maionese Hellmann's sachê 400g", categoria: 'Alimentação', essencial: true, quantidade: 1, unidade: 'un', valorUni: 10.89, valorTotal: 10.89, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-21', produto: 'Macarrão penne Vitarella 400g', categoria: 'Alimentação', essencial: true, quantidade: 1, unidade: 'un', valorUni: 4.25, valorTotal: 4.25, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-22', produto: 'Sal refinado Lebre 1kg', categoria: 'Alimentação', essencial: true, quantidade: 1, unidade: 'un', valorUni: 1.95, valorTotal: 1.95, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-23', produto: 'Achocolatado em pó Nescau sachê 730g', categoria: 'Não Essencial', essencial: false, quantidade: 1, unidade: 'un', valorUni: 24.29, valorTotal: 24.29, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-24', produto: 'Café Pilão 250g tradicional', categoria: 'Alimentação', essencial: true, quantidade: 1, unidade: 'un', valorUni: 15.98, valorTotal: 15.98, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-25', produto: 'Leite em pó integral CCGL 1kg', categoria: 'Laticínios', essencial: true, quantidade: 1, unidade: 'un', valorUni: 33.96, valorTotal: 33.96, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-26', produto: 'Feijão branco Rio Imperial 500g', categoria: 'Alimentação', essencial: true, quantidade: 1, unidade: 'un', valorUni: 6.99, valorTotal: 6.99, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-27', produto: 'Biscoito manteiga Marilan 300g chocolate', categoria: 'Não Essencial', essencial: false, quantidade: 1, unidade: 'un', valorUni: 6.48, valorTotal: 6.48, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-28', produto: 'Mistura para bolo Dona Benta 450g chocolate/avelã', categoria: 'Não Essencial', essencial: false, quantidade: 1, unidade: 'un', valorUni: 8.68, valorTotal: 8.68, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-29', produto: 'Milho para pipoca Yoki 400g', categoria: 'Não Essencial', essencial: false, quantidade: 1, unidade: 'un', valorUni: 5.46, valorTotal: 5.46, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-30', produto: 'Ketchup Tambaú PET 1,2kg', categoria: 'Alimentação', essencial: true, quantidade: 1, unidade: 'un', valorUni: 11.75, valorTotal: 11.75, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-31', produto: 'Creme de leite Itambé leve TP 200g', categoria: 'Laticínios', essencial: true, quantidade: 2, unidade: 'un', valorUni: 3.46, valorTotal: 6.92, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-32', produto: 'Molho Tambaú Pizza 300g', categoria: 'Alimentação', essencial: true, quantidade: 1, unidade: 'un', valorUni: 2.68, valorTotal: 2.68, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-33', produto: 'Extrato de tomate Tambaú sachê 300g', categoria: 'Alimentação', essencial: true, quantidade: 1, unidade: 'un', valorUni: 3.89, valorTotal: 3.89, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-34', produto: 'Lasanha sem Fortaleza 500g', categoria: 'Alimentação', essencial: true, quantidade: 1, unidade: 'un', valorUni: 9.15, valorTotal: 9.15, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-35', produto: 'Leite condensado Bendito 395g', categoria: 'Laticínios', essencial: true, quantidade: 1, unidade: 'un', valorUni: 5.88, valorTotal: 5.88, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-36', produto: 'Refrigerante CR Naville 200g trad.', categoria: 'Não Essencial', essencial: false, quantidade: 4, unidade: 'un', valorUni: 6.90, valorTotal: 27.60, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-37', produto: 'Linguiça calabresa Serra Curada', categoria: 'Carnes', essencial: true, quantidade: 0.810, unidade: 'kg', valorUni: 29.99, valorTotal: 24.29, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-38', produto: 'Linguiça calabresa Serra Curada', categoria: 'Carnes', essencial: true, quantidade: 0.736, unidade: 'kg', valorUni: 29.99, valorTotal: 22.07, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-39', produto: 'Bebida láctea Tina Rolf 1L', categoria: 'Laticínios', essencial: true, quantidade: 1, unidade: 'un', valorUni: 4.38, valorTotal: 4.38, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-40', produto: 'Bebida láctea Tina Rolf 1L', categoria: 'Laticínios', essencial: true, quantidade: 1, unidade: 'un', valorUni: 4.38, valorTotal: 4.38, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-41', produto: 'Bebida láctea Tina Rolf 1L', categoria: 'Laticínios', essencial: true, quantidade: 1, unidade: 'un', valorUni: 4.38, valorTotal: 4.38, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-42', produto: 'Filé peito de frango', categoria: 'Carnes', essencial: true, quantidade: 4, unidade: 'kg', valorUni: 17.69, valorTotal: 70.76, mercado: mercadoJulho, data: dataJulho },
+  { id: 'jul-43', produto: 'Sacola camiseta verde 58x70', categoria: 'Outros', essencial: false, quantidade: 1, unidade: 'un', valorUni: 0.30, valorTotal: 0.30, mercado: mercadoJulho, data: dataJulho },
+];
+
 export const SEED_ESTOQUE: Estoque[] = [
   {
     id: 'est-1',
