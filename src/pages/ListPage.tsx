@@ -64,7 +64,7 @@ export default function ListPage() {
   };
 
   return (
-    <div className="h-full overflow-y-auto overflow-x-hidden pb-32 pt-16" style={{ WebkitOverflowScrolling: 'touch' }}>
+    <div className="h-full overflow-y-auto overflow-x-hidden pb-32 pt-6" style={{ WebkitOverflowScrolling: 'touch' }}>
       <div className="px-4 flex flex-col gap-4">
 
         {/* Page Title */}

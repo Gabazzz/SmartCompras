@@ -149,12 +149,19 @@ export default function StockPage() {
   };
 
   return (
-    <div className="h-full overflow-y-auto overflow-x-hidden pb-32 pt-16" style={{ WebkitOverflowScrolling: 'touch' }}>
+    <div className="h-full overflow-y-auto overflow-x-hidden pb-32 pt-6" style={{ WebkitOverflowScrolling: 'touch' }}>
       <div className="px-4 flex flex-col gap-5">
 
         {/* Page Title */}
-        <section className="pt-4">
+        <section className="pt-4 flex justify-between items-center">
           <h1 className="font-display font-bold text-3xl text-white">Estoque</h1>
+          <button
+            onClick={() => setShowAdd(true)}
+            className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[#39FF14] hover:bg-white/10 active:scale-95 transition-all"
+            title="Novo Item"
+          >
+            <Plus className="w-5 h-5" />
+          </button>
         </section>
 
         {/* Alerta Crítico */}
