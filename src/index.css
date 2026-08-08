@@ -5,33 +5,31 @@
 =========================== */
 @layer base {
   :root {
-    /* === FUNDOS PREMIUM === */
-    --bg-base:        #06080D; /* Quase preto profundo */
-    --bg-surface:     #0D111A; /* Superfícies elevadas */
-    --bg-card:        rgba(20, 25, 35, 0.5); /* Translúcido */
-    --bg-card-hover:  rgba(30, 36, 48, 0.6);
+    /* === FUNDOS PREMIUM (SmartCompras Spec) === */
+    --bg-base:        #0A0A0F; /* Deep dark background */
+    --bg-surface:     #131318; /* Surface container */
+    --bg-card:        rgba(255, 255, 255, 0.03); /* Glass panel */
+    --bg-card-hover:  rgba(255, 255, 255, 0.06);
 
-    /* === NEON SUAVE (Linear/iOS style) === */
-    --neon-green:        #10B981; /* Emerald suave, não grita na tela */
-    --neon-green-glow:   rgba(16, 185, 129, 0.15);
-    --neon-blue:         #3B82F6;
-    --neon-blue-glow:    rgba(59, 130, 246, 0.15);
-    --neon-red:          #EF4444;
-    --neon-red-glow:     rgba(239, 68, 68, 0.15);
-    --neon-purple:       #8B5CF6;
-    --neon-purple-glow:  rgba(139, 92, 246, 0.15);
-    --neon-yellow:       #F59E0B;
-    --neon-yellow-glow:  rgba(245, 158, 11, 0.15);
+    /* === NEON (SmartCompras Spec) === */
+    --neon-green:        #39FF14; /* Primary */
+    --neon-green-glow:   rgba(57, 255, 20, 0.4);
+    --neon-cyan:         #00F5FF; /* Tertiary */
+    --neon-cyan-glow:    rgba(0, 245, 255, 0.4);
+    --neon-red:          #FF3131; /* Secondary */
+    --neon-red-glow:     rgba(255, 49, 49, 0.4);
+    --neon-yellow:       #FFD700;
+    --neon-yellow-glow:  rgba(255, 215, 0, 0.4);
 
     /* === TEXTO === */
-    --text-primary:   #F8FAFC;
-    --text-secondary: #94A3B8;
-    --text-muted:     #475569;
+    --text-primary:   #E4E1E9;
+    --text-secondary: #BACCB0;
+    --text-muted:     #85967C;
 
     /* === BORDAS & DIVISORES === */
-    --border-subtle:  rgba(255, 255, 255, 0.03);
-    --border-card:    rgba(255, 255, 255, 0.06);
-    --border-active:  rgba(16, 185, 129, 0.3);
+    --border-subtle:  rgba(255, 255, 255, 0.05);
+    --border-card:    rgba(255, 255, 255, 0.1);
+    --border-active:  rgba(57, 255, 20, 0.4);
   }
 }
 

@@ -1,32 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Bell, ChevronRight, Pencil, Check } from 'lucide-react';
+import { Pencil, Check, Lightbulb, ShoppingCart, ChevronRight, Receipt } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
-import { CATEGORIA_EMOJI } from '../types';
-
-function AnimatedNumber({ value }: { value: number }) {
-  const [displayed, setDisplayed] = useState(0);
-  const ref = useRef<number>(0);
-
-  useEffect(() => {
-    const duration = 1000;
-    const startTime = performance.now();
-    const animate = (now: number) => {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 4);
-      ref.current = value * eased;
-      setDisplayed(ref.current);
-      if (progress < 1) requestAnimationFrame(animate);
-    };
-    requestAnimationFrame(animate);
-  }, [value]);
-
-  return <span>{displayed.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>;
-}
 
 const staggerItem = (i: number) => ({
   initial: { opacity: 0, y: 12 },
@@ -35,7 +13,17 @@ const staggerItem = (i: number) => ({
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const { getComprasDoMes, getTotalMes, getPercMeta, getEssenciaisTotal, getNaoEssenciaisTotal, getInsight, meta, setMeta } = useAppStore();
+  const {
+    getComprasDoMes,
+    getTotalMes,
+    getPercMeta,
+    getEssenciaisTotal,
+    getNaoEssenciaisTotal,
+    getInsight,
+    meta,
+    setMeta,
+    estoque,
+  } = useAppStore();
 
   const [editingMeta, setEditingMeta] = useState(false);
   const [metaInput, setMetaInput] = useState(String(meta.valor));
@@ -48,10 +36,10 @@ export default function HomePage() {
   const ultimas = compras.slice(0, 5);
   const insight = getInsight();
 
-  const mesAtual = format(new Date(), "MMMM 'de' yyyy", { locale: ptBR });
-  
-  // Progress class mapping
-  const barClass = perc >= 100 ? 'red' : perc >= 80 ? 'yellow' : 'green';
+  // Contagem de itens para comprar (estoque baixo)
+  const itensParaComprar = estoque.filter(
+    (e) => (e.qtdMinima > 0 ? (e.qtdAtual / e.qtdMinima) * 100 : 100) <= 70
+  );
 
   const saveMeta = () => {
     const v = parseFloat(metaInput.replace(',', '.'));
@@ -60,131 +48,162 @@ export default function HomePage() {
   };
 
   return (
-    <div className="scroll-area" style={{ height: '100%', paddingBottom: 100 }}>
-      {/* Header Minimal */}
-      <div style={{ padding: '48px 24px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <img src="/logo.png" alt="SmartCompras Logo" style={{ width: 40, height: 40, objectFit: 'contain' }} />
+    <div className="scroll-area h-full pt-20 pb-28 px-6 flex flex-col gap-6">
+      {/* Greeting Section */}
+      <section>
+        <h2 className="font-display font-semibold text-xl text-[#39FF14] tracking-tight">
+          Olá, Smart User
+        </h2>
+        <p className="text-xs text-on-surface-variant font-body mt-0.5">Visão geral do mês</p>
+      </section>
+
+      {/* Card 1: Gasto no Mês (Hero) */}
+      <section className="glass-panel rounded-xl p-4 flex flex-col gap-4 relative overflow-hidden">
+        <div className="flex justify-between items-start">
           <div>
-            <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 18, color: 'var(--text-primary)' }}>SmartCompras</div>
-            <div style={{ fontSize: 13, color: 'var(--text-muted)', textTransform: 'capitalize' }}>{mesAtual}</div>
-          </div>
-        </div>
-        <button className="btn-ghost" style={{ width: 44, height: 44, borderRadius: 22, padding: 0 }}>
-          <Bell size={20} strokeWidth={1.5} />
-        </button>
-      </div>
-
-      <div style={{ padding: '0 24px', display: 'flex', flexDirection: 'column', gap: 32 }}>
-        
-        {/* HERO SECTION */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0, transition: { duration: 0.4 } }}>
-          <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 8, fontWeight: 500 }}>Total gasto</div>
-          <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 44, color: 'var(--text-primary)', letterSpacing: '-0.03em', lineHeight: 1 }}>
-            <AnimatedNumber value={total} />
-          </div>
-          
-          <div style={{ marginTop: 24 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 13, color: 'var(--text-secondary)' }}>
-              <span>Orçamento: {meta.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
-              <span style={{ fontWeight: 600, color: `var(--neon-${barClass})` }}>{perc.toFixed(0)}%</span>
+            <p className="font-label text-xs text-on-surface-variant uppercase tracking-wider">
+              Gasto no Mês
+            </p>
+            <div className="font-display font-bold text-3xl text-on-surface mt-1">
+              {total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
             </div>
-            <div className="progress-track" style={{ height: 6 }}>
-              <div className={`progress-fill ${barClass}`} style={{ width: `${Math.min(perc, 100)}%` }} />
-            </div>
-            
-            <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                Livre: {Math.max(0, meta.valor - total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-              </span>
-              {editingMeta ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <input 
-                    className="input" 
-                    style={{ padding: '4px 8px', fontSize: 13, width: 90, textAlign: 'right' }} 
-                    value={metaInput} 
-                    onChange={(e) => setMetaInput(e.target.value)} 
-                    onKeyDown={(e) => e.key === 'Enter' && saveMeta()} 
-                    autoFocus 
-                  />
-                  <button onClick={saveMeta} style={{ background: 'none', border: 'none', color: 'var(--neon-green)', padding: 4, cursor: 'pointer' }}>
-                    <Check size={16} />
-                  </button>
-                </div>
-              ) : (
-                <button onClick={() => { setMetaInput(String(meta.valor)); setEditingMeta(true); }} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-                  Editar <Pencil size={12} />
-                </button>
-              )}
-            </div>
-          </div>
-        </motion.div>
-
-        {/* INSIGHT CARD (Mais Premium) */}
-        <motion.div className="card" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0, transition: { duration: 0.4, delay: 0.1 } }} style={{ padding: 16, display: 'flex', gap: 12, alignItems: 'flex-start', background: 'rgba(139, 92, 246, 0.05)', borderColor: 'rgba(139, 92, 246, 0.15)' }}>
-          <div style={{ background: 'rgba(139, 92, 246, 0.1)', padding: 8, borderRadius: 10 }}>✨</div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.5 }}>{insight}</div>
-          </div>
-        </motion.div>
-
-        {/* STATS RÁPIDOS */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { delay: 0.15 } }} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <div style={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span className="dot green" /> Essenciais
-            </div>
-            <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 18, color: 'var(--text-primary)' }}>
-              {essenciais.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-            </div>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <div style={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span className={`dot ${total > 0 && (naoEssenciais / total) * 100 > 25 ? 'red' : 'yellow'}`} /> Supérfluos
-            </div>
-            <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 18, color: 'var(--text-primary)' }}>
-              {naoEssenciais.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-            </div>
-          </div>
-        </motion.div>
-
-        {/* ÚLTIMAS COMPRAS */}
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-            <span className="section-label">Recentes</span>
-            <button onClick={() => navigate('/lista')} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 2 }}>
-              Ver todas <ChevronRight size={14} />
-            </button>
           </div>
 
-          {ultimas.length === 0 ? (
-            <div className="empty-state">
-              <span style={{ fontSize: 32 }}>🛒</span>
-              <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>Nenhuma compra este mês</p>
+          {editingMeta ? (
+            <div className="flex items-center gap-2">
+              <input
+                className="glass-panel rounded px-2 py-1 text-xs text-white w-20 outline-none text-right font-display"
+                value={metaInput}
+                onChange={(e) => setMetaInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && saveMeta()}
+                autoFocus
+              />
+              <button
+                onClick={saveMeta}
+                className="text-[#39FF14] hover:opacity-80 p-1"
+              >
+                <Check className="w-4 h-4" />
+              </button>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {ultimas.map((compra, i) => (
-                <motion.button key={compra.id} {...staggerItem(i)} className="list-item" onClick={() => navigate('/lista')}>
-                  <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--bg-card)', border: '1px solid var(--border-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, marginRight: 16 }}>
-                    {CATEGORIA_EMOJI[compra.categoria]}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
-                    <div style={{ fontWeight: 500, fontSize: 15, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{compra.produto}</div>
-                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{format(parseISO(compra.data), 'dd/MM', { locale: ptBR })}</div>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-                    <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 15, color: 'var(--text-primary)' }}>
-                      {compra.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                    </span>
-                  </div>
-                </motion.button>
-              ))}
-            </div>
+            <button
+              onClick={() => {
+                setMetaInput(String(meta.valor));
+                setEditingMeta(true);
+              }}
+              className="flex items-center justify-center p-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 transition-colors text-on-surface-variant"
+              title="Editar Meta"
+            >
+              <Pencil className="w-4 h-4" />
+            </button>
           )}
         </div>
-        
-      </div>
+
+        <div className="flex flex-col gap-2">
+          <div className="flex justify-between font-label text-xs">
+            <span className="text-[#39FF14] font-semibold">{perc.toFixed(0)}% Utilizado</span>
+            <span className="text-on-surface-variant">
+              Meta: {meta.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            </span>
+          </div>
+          <div className="h-2 w-full bg-[#1A1A1F] rounded-full overflow-hidden">
+            <div
+              className="h-full bg-[#39FF14] shadow-[0_0_10px_rgba(57,255,20,0.6)] rounded-full transition-all duration-1000 ease-out"
+              style={{ width: `${Math.min(perc, 100)}%` }}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Grid: Essenciais vs Supérfluos */}
+      <section className="grid grid-cols-2 gap-4">
+        <div className="glass-panel rounded-xl p-3 flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-[#00F5FF] shadow-[0_0_6px_#00F5FF]" />
+            <span className="font-label text-xs text-on-surface-variant">Essenciais</span>
+          </div>
+          <span className="font-display font-semibold text-lg text-on-surface mt-1">
+            {essenciais.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+          </span>
+        </div>
+
+        <div className="glass-panel rounded-xl p-3 flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-[#FF3131] shadow-[0_0_6px_#FF3131]" />
+            <span className="font-label text-xs text-on-surface-variant">Supérfluos</span>
+          </div>
+          <span className="font-display font-semibold text-lg text-on-surface mt-1">
+            {naoEssenciais.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+          </span>
+        </div>
+      </section>
+
+      {/* Insight Inteligente */}
+      <section className="glass-panel rounded-xl p-4 flex gap-3 items-start border-l-2 border-l-[#00F5FF] bg-gradient-to-r from-[#00F5FF]/10 to-transparent">
+        <Lightbulb className="w-5 h-5 text-[#00F5FF] shrink-0 mt-0.5" />
+        <div className="flex flex-col gap-1">
+          <h3 className="font-label font-semibold text-xs text-[#00F5FF]">Insight Inteligente</h3>
+          <p className="font-body text-xs text-on-surface-variant leading-relaxed">{insight}</p>
+        </div>
+      </section>
+
+      {/* Shortcut Banner -> /comprar */}
+      <section
+        onClick={() => navigate('/comprar')}
+        className="glass-panel rounded-xl p-4 flex justify-between items-center cursor-pointer hover:bg-white/5 transition-all border border-[#39FF14]/20 hover:border-[#39FF14]/40"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-[#39FF14]/20 flex items-center justify-center shrink-0">
+            <ShoppingCart className="w-5 h-5 text-[#39FF14]" />
+          </div>
+          <div>
+            <h3 className="font-body font-medium text-sm text-[#39FF14]">
+              {itensParaComprar.length} itens para comprar
+            </h3>
+            <p className="font-label text-xs text-on-surface-variant">Lista de compras</p>
+          </div>
+        </div>
+        <ChevronRight className="w-5 h-5 text-on-surface-variant" />
+      </section>
+
+      {/* Últimas Compras List */}
+      <section className="flex flex-col gap-3">
+        <h3 className="font-label text-xs text-on-surface-variant uppercase tracking-wider">
+          Últimas Compras
+        </h3>
+
+        {ultimas.length === 0 ? (
+          <div className="glass-panel rounded-xl p-4 text-center text-xs text-on-surface-variant">
+            Nenhuma compra registrada neste mês
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {ultimas.map((compra, i) => (
+              <motion.div
+                key={compra.id}
+                {...staggerItem(i)}
+                className="glass-panel rounded-xl p-3 flex justify-between items-center border border-white/5 cursor-pointer hover:bg-white/5 transition-colors"
+                onClick={() => navigate('/lista')}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center shrink-0">
+                    <Receipt className="w-4 h-4 text-on-surface-variant" />
+                  </div>
+                  <div className="flex flex-col">
+                    <p className="font-body font-medium text-sm text-on-surface">{compra.produto}</p>
+                    <p className="font-label text-[10px] text-on-surface-variant">
+                      {format(parseISO(compra.data), 'dd MMM', { locale: ptBR })}
+                    </p>
+                  </div>
+                </div>
+                <span className="font-body font-semibold text-sm text-on-surface">
+                  {compra.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                </span>
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }

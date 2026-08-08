@@ -2,6 +2,7 @@ import { HashRouter, Routes, Route } from 'react-router-dom';
 import AppLayout from './components/layout/AppLayout';
 import { MinuToaster } from './components/ui/MinuToaster';
 import HomePage from './pages/HomePage';
+import ComprarPage from './pages/ComprarPage';
 import NewPurchasePage from './pages/NewPurchasePage';
 import ListPage from './pages/ListPage';
 import StockPage from './pages/StockPage';
@@ -15,7 +16,7 @@ function App() {
         <Route
           path="/nova"
           element={
-            <AppLayout hideNav={false}>
+            <AppLayout hideNav={true}>
               <NewPurchasePage />
             </AppLayout>
           }
@@ -27,6 +28,7 @@ function App() {
             <AppLayout>
               <Routes>
                 <Route path="/" element={<HomePage />} />
+                <Route path="/comprar" element={<ComprarPage />} />
                 <Route path="/lista" element={<ListPage />} />
                 <Route path="/estoque" element={<StockPage />} />
               </Routes>
