@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, useMotionValue, useTransform, AnimatePresence } from 'framer-motion';
+import { motion, useMotionValue, useTransform, AnimatePresence, animate } from 'framer-motion';
 import { Trash2, Pencil, AlertTriangle, X, Check } from 'lucide-react';
 
 interface Props {
@@ -22,16 +22,25 @@ export default function SwipeableListItem({
   const deleteOpacity = useTransform(x, [-80, -20, 0], [1, 0.5, 0]);
   const editOpacity = useTransform(x, [0, 20, 80], [0, 0.5, 1]);
 
+  const resetPosition = () => {
+    animate(x, 0, { type: 'spring', stiffness: 400, damping: 30 });
+  };
+
   const handleDragEnd = (_: unknown, info: { offset: { x: number } }) => {
-    if (info.offset.x < -60 && onDelete) {
+    if (info.offset.x < -50 && onDelete) {
       setShowDeleteConfirm(true);
-    } else if (info.offset.x > 60 && onEdit) {
+      resetPosition();
+    } else if (info.offset.x > 50 && onEdit) {
+      resetPosition();
       onEdit();
+    } else {
+      resetPosition();
     }
   };
 
   const confirmDelete = () => {
     setShowDeleteConfirm(false);
+    resetPosition();
     onDelete?.();
   };
 
@@ -39,7 +48,7 @@ export default function SwipeableListItem({
     <>
       <div className="relative w-full overflow-hidden rounded-2xl">
         {/* Background Action Indicators */}
-        <div className="absolute inset-0 flex items-center justify-between px-4 rounded-2xl pointer-events-none">
+        <div className="absolute inset-0 flex items-center justify-between px-4 rounded-2xl pointer-events-none bg-white/[0.02]">
           {/* Swipe Right -> EDIT (Left side background) */}
           <motion.div
             style={{ opacity: editOpacity }}
@@ -80,15 +89,18 @@ export default function SwipeableListItem({
       <AnimatePresence>
         {showDeleteConfirm && (
           <motion.div
-            className="fixed inset-0 bg-black/70 z-[80] backdrop-blur-sm flex items-center justify-center px-6"
+            className="fixed inset-0 bg-black/75 z-[90] backdrop-blur-sm flex items-center justify-center px-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setShowDeleteConfirm(false)}
+            onClick={() => {
+              setShowDeleteConfirm(false);
+              resetPosition();
+            }}
           >
             <motion.div
               className="w-full max-w-sm rounded-3xl p-6 flex flex-col gap-4 border border-[#FF3131]/30 shadow-[0_0_30px_rgba(255,49,49,0.2)]"
-              style={{ background: 'rgba(15, 17, 22, 0.98)' }}
+              style={{ background: '#0D0F14' }}
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -107,7 +119,10 @@ export default function SwipeableListItem({
 
               <div className="flex gap-3 mt-2">
                 <button
-                  onClick={() => setShowDeleteConfirm(false)}
+                  onClick={() => {
+                    setShowDeleteConfirm(false);
+                    resetPosition();
+                  }}
                   className="flex-1 py-3.5 rounded-xl font-label text-xs font-semibold text-white/60 hover:text-white border border-white/10 bg-white/5 active:scale-95 transition-all flex items-center justify-center gap-1.5"
                 >
                   <X className="w-4 h-4" /> Cancelar

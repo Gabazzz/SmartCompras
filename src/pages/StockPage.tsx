@@ -82,7 +82,7 @@ function Section({
 }
 
 export default function StockPage() {
-  const { estoque, addEstoque, updateEstoque, deleteEstoque, addCompra, mercados } = useAppStore();
+  const { estoque, addEstoque, updateEstoque, deleteEstoque, addCompra } = useAppStore();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showAdd, setShowAdd] = useState(false);
 
@@ -138,7 +138,7 @@ export default function StockPage() {
       unidade: selected.unidade,
       valorUni: 0,
       valorTotal: 0,
-      mercado: mercados[0] || 'Mercado A',
+      mercado: '',
       data: new Date().toISOString(),
     });
     toast.success(`${selected.produto} adicionado à lista!`, {
@@ -216,15 +216,15 @@ export default function StockPage() {
       <AnimatePresence>
         {selectedId && selected && (
           <motion.div
-            className="fixed inset-0 bg-black/70 z-[60] backdrop-blur-sm"
+            className="fixed inset-0 bg-black/75 z-[70] backdrop-blur-sm flex items-end justify-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setSelectedId(null)}
           >
             <motion.div
-              className="fixed bottom-0 left-0 w-full rounded-t-3xl z-[70] p-6 pb-10 flex flex-col gap-5 max-h-[85vh] overflow-y-auto"
-              style={{ background: 'rgba(13, 15, 20, 0.97)', backdropFilter: 'blur(32px)', borderTop: '1px solid rgba(255,255,255,0.1)' }}
+              className="w-full max-w-[480px] rounded-t-3xl p-6 pb-10 flex flex-col gap-5 max-h-[85vh] overflow-y-auto z-[80]"
+              style={{ background: '#0D0F14', borderTop: '1px solid rgba(255,255,255,0.12)' }}
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
@@ -292,15 +292,15 @@ export default function StockPage() {
       <AnimatePresence>
         {showAdd && (
           <motion.div
-            className="fixed inset-0 bg-black/70 z-[60] backdrop-blur-sm"
+            className="fixed inset-0 bg-black/75 z-[70] backdrop-blur-sm flex items-end justify-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowAdd(false)}
           >
             <motion.div
-              className="fixed bottom-0 left-0 w-full rounded-t-3xl z-[70] p-6 pb-10 flex flex-col gap-5 max-h-[85vh] overflow-y-auto"
-              style={{ background: 'rgba(13, 15, 20, 0.97)', backdropFilter: 'blur(32px)', borderTop: '1px solid rgba(255,255,255,0.1)' }}
+              className="w-full max-w-[480px] rounded-t-3xl p-6 pb-10 flex flex-col gap-5 max-h-[85vh] overflow-y-auto z-[80]"
+              style={{ background: '#0D0F14', borderTop: '1px solid rgba(255,255,255,0.12)' }}
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}

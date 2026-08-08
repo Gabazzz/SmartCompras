@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, ChevronLeft, ChevronRight, Trash2, Store, ChevronDown, ChevronUp, Check } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Trash2, ChevronDown, ChevronUp, Check } from 'lucide-react';
 import { format, parseISO, addMonths, subMonths, isSameMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import toast from 'react-hot-toast';
@@ -30,7 +30,7 @@ export default function ListPage() {
     let res = catFiltro === 'Todos' ? doMes : doMes.filter((c) => c.categoria === catFiltro);
     if (search.trim()) {
       const q = search.toLowerCase();
-      res = res.filter((c) => c.produto.toLowerCase().includes(q) || c.mercado.toLowerCase().includes(q));
+      res = res.filter((c) => c.produto.toLowerCase().includes(q));
     }
     return res;
   }, [doMes, catFiltro, search]);
@@ -128,7 +128,7 @@ export default function ListPage() {
           className="w-full h-11 flex items-center gap-2 px-4 rounded-2xl border border-white/[0.08] bg-white/[0.03] text-white/40 text-sm font-label hover:bg-white/[0.06] transition-colors"
         >
           <Search className="w-4 h-4" />
-          <span>{search || 'Buscar compras ou produtos...'}</span>
+          <span>{search || 'Buscar compras...'}</span>
         </button>
 
         <AnimatePresence>
@@ -144,7 +144,7 @@ export default function ListPage() {
                 <input
                   className="w-full rounded-2xl py-3 pl-10 pr-4 text-white text-sm outline-none transition-colors font-body"
                   style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(0,245,255,0.3)' }}
-                  placeholder="Buscar compras ou produtos..."
+                  placeholder="Buscar compras..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   autoFocus
@@ -224,10 +224,7 @@ export default function ListPage() {
                               <div className="flex justify-between items-start pl-3 cursor-pointer" onClick={() => setExpandedId(null)}>
                                 <div className="flex flex-col gap-0.5">
                                   <h4 className="font-display font-semibold text-base text-white">{compra.produto}</h4>
-                                  <div className="flex items-center gap-1.5 text-xs text-white/40 font-label">
-                                    <Store className="w-3 h-3" />
-                                    <span>{compra.mercado}</span>
-                                  </div>
+                                  <span className="text-xs text-white/40 font-label">{compra.categoria}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <span className="font-display font-bold text-base text-[#39FF14]">
@@ -286,8 +283,7 @@ export default function ListPage() {
                               <div className="flex flex-col gap-1">
                                 <h4 className="font-body font-medium text-sm text-white">{compra.produto}</h4>
                                 <div className="flex items-center gap-2 text-xs text-white/40 font-label">
-                                  <Store className="w-3 h-3" />
-                                  <span>{compra.mercado}</span>
+                                  <span>{compra.categoria}</span>
                                   <span className="w-1 h-1 rounded-full bg-white/20" />
                                   <span style={{ color: compra.essencial ? '#39FF14' : '#FF3131' }}>
                                     {compra.essencial ? 'Essencial' : 'Supérfluo'}

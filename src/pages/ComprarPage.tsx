@@ -186,15 +186,15 @@ export default function ComprarPage() {
       <AnimatePresence>
         {showAddModal && (
           <motion.div
-            className="fixed inset-0 bg-black/70 z-[60] backdrop-blur-sm"
+            className="fixed inset-0 bg-black/75 z-[70] backdrop-blur-sm flex items-end justify-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowAddModal(false)}
           >
             <motion.div
-              className="fixed bottom-0 left-0 w-full rounded-t-3xl z-[70] p-6 pb-10 flex flex-col gap-5"
-              style={{ background: 'rgba(15, 17, 22, 0.97)', backdropFilter: 'blur(32px)', borderTop: '1px solid rgba(255,255,255,0.1)' }}
+              className="w-full max-w-[480px] rounded-t-3xl p-6 pb-10 flex flex-col gap-5 z-[80]"
+              style={{ background: '#0D0F14', borderTop: '1px solid rgba(255,255,255,0.12)' }}
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, Delete, ArrowRight, Store, Pencil } from 'lucide-react';
+import { X, Check, Delete, ArrowRight, Pencil } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAppStore } from '../store/useAppStore';
 import { CATEGORIA_EMOJI, type Categoria, type Unidade } from '../types';
@@ -14,11 +14,10 @@ const UNIDADES: Unidade[] = ['un', 'kg', 'g', 'L', 'mL', 'cx', 'pct'];
 
 export default function NewPurchasePage() {
   const navigate = useNavigate();
-  const { addCompra, compras, mercados } = useAppStore();
+  const { addCompra, compras } = useAppStore();
 
   const [step, setStep] = useState<1 | 2>(1);
   const [produto, setProduto] = useState('');
-  const [mercado, setMercado] = useState('');
   const [categoria, setCategoria] = useState<Categoria | ''>('');
   const [essencial, setEssencial] = useState(true);
   const [valorStr, setValorStr] = useState('0');
@@ -29,9 +28,6 @@ export default function NewPurchasePage() {
 
   const prodSugs = Array.from(
     new Set(compras.filter((c) => c.produto.toLowerCase().includes(produto.toLowerCase())).map((c) => c.produto))
-  ).slice(0, 3);
-  const mercSugs = Array.from(
-    new Set(mercados.filter((m) => m.toLowerCase().includes(mercado.toLowerCase())))
   ).slice(0, 3);
 
   useEffect(() => {
@@ -45,7 +41,6 @@ export default function NewPurchasePage() {
       setCategoria(last.categoria);
       setEssencial(last.essencial);
       setUnidade(last.unidade);
-      setMercado(last.mercado);
     }
   };
 
@@ -62,10 +57,10 @@ export default function NewPurchasePage() {
   const valFinal = parseInt(valorStr, 10) / 100;
   const displayValor = valFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   const valUnitario = (valFinal / (parseFloat(qtd) || 1)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  const canContinue = !!produto && !!categoria && !!mercado;
+  const canContinue = !!produto && !!categoria;
 
   const handleSave = () => {
-    if (!produto || !categoria || !mercado) {
+    if (!produto || !categoria) {
       toast.error('Preencha os campos obrigatórios', {
         style: { background: '#131318', color: '#e4e1e9', border: '1px solid rgba(255,255,255,0.1)' },
       });
@@ -78,7 +73,10 @@ export default function NewPurchasePage() {
       return;
     }
     addCompra({
-      produto, categoria, essencial, mercado,
+      produto,
+      categoria,
+      essencial,
+      mercado: '',
       quantidade: parseFloat(qtd) || 1,
       unidade,
       valorUni: valFinal / (parseFloat(qtd) || 1),
@@ -141,32 +139,6 @@ export default function NewPurchasePage() {
                   <div className="flex gap-2 mt-2 flex-wrap">
                     {prodSugs.map((s) => (
                       <button key={s} onClick={() => selectProd(s)}
-                        className="px-3 py-1 rounded-full text-xs text-white/50 hover:text-white transition-colors font-label"
-                        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Mercado */}
-              <div className="flex flex-col gap-2">
-                <label className="text-[10px] text-white/40 uppercase tracking-widest font-label">Mercado</label>
-                <div className="relative w-full h-12 flex items-center rounded-xl"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                  <Store className="w-4 h-4 text-white/30 ml-3.5 shrink-0" />
-                  <input
-                    className="w-full bg-transparent border-none outline-none text-white font-body text-sm pl-2.5 pr-4 h-full placeholder:text-white/25"
-                    placeholder="Ex: Carrefour, Atacadão..."
-                    value={mercado}
-                    onChange={(e) => setMercado(e.target.value)}
-                  />
-                </div>
-                {mercado && mercSugs.length > 0 && (
-                  <div className="flex gap-2 flex-wrap">
-                    {mercSugs.map((s) => (
-                      <button key={s} onClick={() => setMercado(s)}
                         className="px-3 py-1 rounded-full text-xs text-white/50 hover:text-white transition-colors font-label"
                         style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
                         {s}
