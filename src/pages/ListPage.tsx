@@ -8,22 +8,9 @@ import { useAppStore } from '../store/useAppStore';
 import { CATEGORIA_EMOJI, type Categoria } from '../types';
 
 const CATS: (Categoria | 'Todos')[] = [
-  'Todos',
-  'Alimentação',
-  'Hortifruti',
-  'Laticínios',
-  'Carnes',
-  'Limpeza',
-  'Higiene',
-  'Farmácia',
-  'Não Essencial',
-  'Outros',
+  'Todos', 'Alimentação', 'Hortifruti', 'Laticínios', 'Carnes',
+  'Limpeza', 'Higiene', 'Farmácia', 'Não Essencial', 'Outros',
 ];
-
-const staggerItem = (i: number) => ({
-  initial: { opacity: 0, y: 8 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.25, delay: i * 0.04 } },
-});
 
 export default function ListPage() {
   const { compras, deleteCompra, meta } = useAppStore();
@@ -42,9 +29,7 @@ export default function ListPage() {
     let res = catFiltro === 'Todos' ? doMes : doMes.filter((c) => c.categoria === catFiltro);
     if (search.trim()) {
       const q = search.toLowerCase();
-      res = res.filter(
-        (c) => c.produto.toLowerCase().includes(q) || c.mercado.toLowerCase().includes(q)
-      );
+      res = res.filter((c) => c.produto.toLowerCase().includes(q) || c.mercado.toLowerCase().includes(q));
     }
     return res;
   }, [doMes, catFiltro, search]);
@@ -73,70 +58,78 @@ export default function ListPage() {
     const d = parseISO(dataStr);
     const today = new Date();
     if (isSameMonth(d, today) && d.getDate() === today.getDate()) return 'Hoje';
-    if (isSameMonth(d, today) && d.getDate() === today.getDate() - 1) return 'Ontem, ' + format(d, "dd 'de' MMMM", { locale: ptBR });
+    if (isSameMonth(d, today) && d.getDate() === today.getDate() - 1)
+      return 'Ontem, ' + format(d, "dd 'de' MMMM", { locale: ptBR });
     return format(d, "dd 'de' MMMM", { locale: ptBR });
   };
 
   return (
-    <div className="scroll-area h-full pb-28">
-      {/* Header */}
-      <div className="px-6 pt-12 pb-4 flex items-center justify-between">
-        <div>
-          <h1 className="font-display font-bold text-2xl text-on-surface">Histórico</h1>
-          <p className="text-xs text-on-surface-variant font-body mt-0.5">
-            {doMes.length} compras · Total: {totalMes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-          </p>
-        </div>
-        <button
-          className="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-on-surface-variant hover:text-white active:scale-95 transition-all"
-          onClick={() => setSearchOpen((s) => !s)}
-        >
-          <Search className="w-5 h-5" />
-        </button>
-      </div>
+    <div className="h-full overflow-y-auto overflow-x-hidden pb-32 pt-16" style={{ WebkitOverflowScrolling: 'touch' }}>
+      <div className="px-4 flex flex-col gap-4">
 
-      <div className="px-6 flex flex-col gap-5">
-        {/* Monthly Spending Progress */}
-        <div className="flex flex-col gap-2">
+        {/* Page Title */}
+        <section className="pt-4">
+          <h1 className="font-display font-bold text-3xl text-white">Histórico</h1>
+          <p className="text-xs text-white/40 font-body mt-0.5">
+            {doMes.length} compras · {totalMes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+          </p>
+        </section>
+
+        {/* Gasto Mensal Progress */}
+        <section className="rounded-2xl p-4 border border-white/[0.08] bg-white/[0.03] flex flex-col gap-2.5">
           <div className="flex justify-between items-end">
-            <span className="font-label text-xs text-on-surface-variant">Gasto Mensal</span>
+            <span className="text-[10px] text-white/40 uppercase tracking-widest font-label">Gasto Mensal</span>
             <div className="flex items-baseline gap-1 font-display">
-              <span className="text-base font-semibold text-on-surface">
+              <span className="text-base font-bold text-white">
                 {totalMes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
               </span>
-              <span className="text-xs text-on-surface-variant">
+              <span className="text-xs text-white/40">
                 / {meta.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
               </span>
             </div>
           </div>
-          <div className="h-2 w-full rounded-full bg-[#1A1A1F] overflow-hidden relative">
+          <div className="h-2 w-full rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
             <div
-              className="absolute top-0 left-0 h-full bg-[#39FF14] shadow-[0_0_8px_#39FF14] rounded-full transition-all duration-700"
-              style={{ width: `${Math.min(percMeta, 100)}%` }}
+              className="h-full rounded-full transition-all duration-700"
+              style={{
+                width: `${Math.min(percMeta, 100)}%`,
+                background: '#39FF14',
+                boxShadow: '0 0 8px rgba(57,255,20,0.6)',
+              }}
             />
           </div>
-        </div>
+        </section>
 
         {/* Month Selector */}
-        <div className="glass-panel rounded-xl py-3 px-4 flex items-center justify-between">
+        <div className="rounded-2xl py-3 px-4 flex items-center justify-between border border-white/[0.08] bg-white/[0.03]">
           <button
             onClick={() => setMesFoco((m) => subMonths(m, 1))}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-on-surface hover:bg-white/10 active:scale-95 transition-all"
+            className="w-8 h-8 flex items-center justify-center rounded-full text-white/60 hover:bg-white/10 active:scale-90 transition-all"
+            style={{ background: 'rgba(255,255,255,0.05)' }}
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <span className="font-display font-semibold text-[#00DCE5] text-base capitalize">
+          <span className="font-display font-semibold text-[#39FF14] text-base capitalize">
             {format(mesFoco, 'MMMM yyyy', { locale: ptBR })}
           </span>
           <button
             onClick={() => setMesFoco((m) => addMonths(m, 1))}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-on-surface hover:bg-white/10 active:scale-95 transition-all"
+            className="w-8 h-8 flex items-center justify-center rounded-full text-white/60 hover:bg-white/10 active:scale-90 transition-all"
+            style={{ background: 'rgba(255,255,255,0.05)' }}
           >
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Search Input */}
+        {/* Search Toggle */}
+        <button
+          onClick={() => setSearchOpen((s) => !s)}
+          className="w-full h-11 flex items-center gap-2 px-4 rounded-2xl border border-white/[0.08] bg-white/[0.03] text-white/40 text-sm font-label hover:bg-white/[0.06] transition-colors"
+        >
+          <Search className="w-4 h-4" />
+          <span>{search || 'Buscar compras ou produtos...'}</span>
+        </button>
+
         <AnimatePresence>
           {searchOpen && (
             <motion.div
@@ -146,11 +139,11 @@ export default function ListPage() {
               className="overflow-hidden"
             >
               <div className="relative w-full">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant pointer-events-none" />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none" />
                 <input
-                  className="w-full glass-panel rounded-xl py-3 pl-10 pr-4 text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-[#00DCE5] transition-colors bg-transparent font-body text-sm"
+                  className="w-full rounded-2xl py-3 pl-10 pr-4 text-white text-sm outline-none transition-colors font-body"
+                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(0,245,255,0.3)' }}
                   placeholder="Buscar compras ou produtos..."
-                  type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   autoFocus
@@ -160,21 +153,27 @@ export default function ListPage() {
           )}
         </AnimatePresence>
 
-        {/* Filter Chips */}
-        <div className="flex overflow-x-auto scroll-x gap-2 pb-1 snap-x">
+        {/* Filter Chips — scroll horizontal */}
+        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4" style={{ scrollbarWidth: 'none' }}>
           {CATS.map((cat) => {
             const active = catFiltro === cat;
             return (
               <button
                 key={cat}
                 onClick={() => setCatFiltro(cat as Categoria | 'Todos')}
-                className={`snap-start shrink-0 h-9 px-4 rounded-full font-label text-xs flex items-center gap-1.5 transition-all ${
-                  active
-                    ? 'border border-[#39FF14] bg-[#39FF14]/20 text-[#39FF14] shadow-[0_0_10px_rgba(57,255,20,0.2)]'
-                    : 'border border-white/10 glass-panel text-on-surface-variant hover:bg-white/5'
-                }`}
+                className="shrink-0 h-9 px-3.5 rounded-full text-xs flex items-center gap-1.5 transition-all font-label whitespace-nowrap"
+                style={active ? {
+                  border: '1px solid rgba(57,255,20,0.5)',
+                  background: 'rgba(57,255,20,0.1)',
+                  color: '#39FF14',
+                  boxShadow: '0 0 10px rgba(57,255,20,0.15)',
+                } : {
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  background: 'rgba(255,255,255,0.03)',
+                  color: 'rgba(255,255,255,0.5)',
+                }}
               >
-                {active && <Check className="w-3.5 h-3.5" />}
+                {active && <Check className="w-3 h-3" />}
                 {cat !== 'Todos' && <span>{CATEGORIA_EMOJI[cat as Categoria]}</span>}
                 <span>{cat}</span>
               </button>
@@ -182,120 +181,118 @@ export default function ListPage() {
           })}
         </div>
 
-        {/* History List Grouped by Date */}
+        {/* Purchase List Grouped by Date */}
         {grouped.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
             <span className="text-4xl">🛒</span>
-            <p className="text-on-surface-variant text-sm font-body">Nenhuma compra registrada neste mês</p>
+            <p className="text-white/40 text-sm">Nenhuma compra registrada neste mês</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-5 pb-4">
             {grouped.map(([dateStr, items]) => (
               <div key={dateStr} className="flex flex-col gap-2">
-                <h3 className="font-label text-xs text-on-surface-variant pl-1 capitalize">
+                <h3 className="text-[10px] text-white/40 font-label uppercase tracking-widest pl-1 capitalize">
                   {labelData(dateStr)}
                 </h3>
 
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2">
                   {items.map((compra, idx) => {
                     const expanded = expandedId === compra.id;
                     return (
-                      <motion.div key={compra.id} {...staggerItem(idx)}>
+                      <motion.div
+                        key={compra.id}
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0, transition: { delay: idx * 0.04 } }}
+                      >
                         {expanded ? (
-                          /* Expanded Card */
-                          <div className="glass-panel rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden border border-[#39FF14]/40 shadow-[0_0_10px_rgba(57,255,20,0.08)]">
-                            <div className="absolute top-0 left-0 w-1 h-full bg-[#39FF14]" />
+                          <div
+                            className="rounded-2xl p-4 flex flex-col gap-3 relative overflow-hidden"
+                            style={{
+                              background: 'rgba(255,255,255,0.04)',
+                              border: '1px solid rgba(57,255,20,0.2)',
+                              boxShadow: '0 0 10px rgba(57,255,20,0.05)',
+                            }}
+                          >
+                            <div className="absolute top-0 left-0 w-[3px] h-full rounded-l-2xl" style={{ background: '#39FF14' }} />
 
-                            <div
-                              className="flex justify-between items-start pl-2 cursor-pointer"
-                              onClick={() => setExpandedId(null)}
-                            >
-                              <div className="flex flex-col gap-1">
-                                <h4 className="font-display font-semibold text-base text-on-surface">
-                                  {compra.produto}
-                                </h4>
-                                <div className="flex items-center gap-1.5 font-label text-xs text-on-surface-variant">
-                                  <Store className="w-3.5 h-3.5 text-on-surface-variant" />
+                            <div className="flex justify-between items-start pl-3 cursor-pointer" onClick={() => setExpandedId(null)}>
+                              <div className="flex flex-col gap-0.5">
+                                <h4 className="font-display font-semibold text-base text-white">{compra.produto}</h4>
+                                <div className="flex items-center gap-1.5 text-xs text-white/40 font-label">
+                                  <Store className="w-3 h-3" />
                                   <span>{compra.mercado}</span>
                                 </div>
                               </div>
-
                               <div className="flex items-center gap-2">
-                                <span className="font-display font-bold text-lg text-[#39FF14]">
+                                <span className="font-display font-bold text-base text-[#39FF14]">
                                   {compra.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                 </span>
-                                <ChevronUp className="w-4 h-4 text-on-surface-variant" />
+                                <ChevronUp className="w-4 h-4 text-white/30" />
                               </div>
                             </div>
 
-                            {/* Details Zone */}
-                            <div className="mt-1 pt-3 border-t border-white/10 flex justify-between items-center bg-white/[0.02] -mx-4 -mb-4 px-4 pb-3 pt-3 rounded-b-xl">
+                            <div
+                              className="mt-1 pt-3 flex justify-between items-center -mx-4 -mb-4 px-4 pb-3 rounded-b-2xl"
+                              style={{ background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.06)' }}
+                            >
                               <div className="flex gap-4">
                                 <div className="flex flex-col">
-                                  <span className="font-label text-[10px] text-on-surface-variant uppercase">Qtd</span>
-                                  <span className="font-body text-xs text-on-surface">
-                                    {compra.quantidade} {compra.unidade}
-                                  </span>
+                                  <span className="text-[9px] text-white/30 uppercase font-label">Qtd</span>
+                                  <span className="text-xs text-white font-body">{compra.quantidade} {compra.unidade}</span>
                                 </div>
                                 <div className="flex flex-col">
-                                  <span className="font-label text-[10px] text-on-surface-variant uppercase">Valor Unit.</span>
-                                  <span className="font-body text-xs text-on-surface">
+                                  <span className="text-[9px] text-white/30 uppercase font-label">Valor Unit.</span>
+                                  <span className="text-xs text-white font-body">
                                     {compra.valorUni.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                   </span>
                                 </div>
                               </div>
-
-                              <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-2">
                                 <span
-                                  className={`px-2 py-0.5 rounded text-[10px] font-label uppercase tracking-wider ${
-                                    compra.essencial
-                                      ? 'bg-[#39FF14]/10 text-[#39FF14] border border-[#39FF14]/30'
-                                      : 'bg-[#FF6B6B]/10 text-[#FF6B6B] border border-[#FF6B6B]/30'
-                                  }`}
+                                  className="px-2.5 py-0.5 rounded text-[9px] font-label uppercase tracking-wider"
+                                  style={compra.essencial ? {
+                                    background: 'rgba(57,255,20,0.08)',
+                                    color: '#39FF14',
+                                    border: '1px solid rgba(57,255,20,0.2)',
+                                  } : {
+                                    background: 'rgba(255,49,49,0.08)',
+                                    color: '#FF3131',
+                                    border: '1px solid rgba(255,49,49,0.2)',
+                                  }}
                                 >
                                   {compra.essencial ? 'Essencial' : 'Supérfluo'}
                                 </span>
-
                                 <button
-                                  className="text-[#FF6B6B] p-1.5 rounded-lg hover:bg-[#FF6B6B]/10 transition-colors"
-                                  title="Excluir"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDelete(compra.id, compra.produto);
-                                  }}
+                                  className="p-1.5 rounded-lg transition-colors text-[#FF3131] hover:bg-[#FF3131]/10"
+                                  onClick={(e) => { e.stopPropagation(); handleDelete(compra.id, compra.produto); }}
                                 >
-                                  <Trash2 className="w-4 h-4" />
+                                  <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               </div>
                             </div>
                           </div>
                         ) : (
-                          /* Collapsed Card */
                           <div
-                            className="glass-panel rounded-xl p-4 flex justify-between items-center cursor-pointer hover:bg-white/5 transition-colors"
+                            className="rounded-2xl p-4 flex justify-between items-center cursor-pointer hover:bg-white/[0.04] active:scale-[0.98] transition-all"
+                            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
                             onClick={() => setExpandedId(compra.id)}
                           >
                             <div className="flex flex-col gap-1">
-                              <h4 className="font-body font-medium text-sm text-on-surface">
-                                {compra.produto}
-                              </h4>
-                              <div className="flex items-center gap-2 font-label text-xs text-on-surface-variant">
-                                <div className="flex items-center gap-1">
-                                  <Store className="w-3.5 h-3.5" />
-                                  <span>{compra.mercado}</span>
-                                </div>
+                              <h4 className="font-body font-medium text-sm text-white">{compra.produto}</h4>
+                              <div className="flex items-center gap-2 text-xs text-white/40 font-label">
+                                <Store className="w-3 h-3" />
+                                <span>{compra.mercado}</span>
                                 <span className="w-1 h-1 rounded-full bg-white/20" />
-                                <span className={compra.essencial ? 'text-[#39FF14]' : 'text-[#FF6B6B]'}>
+                                <span style={{ color: compra.essencial ? '#39FF14' : '#FF3131' }}>
                                   {compra.essencial ? 'Essencial' : 'Supérfluo'}
                                 </span>
                               </div>
                             </div>
-
-                            <div className="flex items-center gap-3">
-                              <span className="font-display font-semibold text-base text-on-surface">
+                            <div className="flex items-center gap-2">
+                              <span className="font-display font-semibold text-sm text-white">
                                 {compra.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                               </span>
-                              <ChevronDown className="w-4 h-4 text-on-surface-variant" />
+                              <ChevronDown className="w-4 h-4 text-white/30" />
                             </div>
                           </div>
                         )}
@@ -307,6 +304,7 @@ export default function ListPage() {
             ))}
           </div>
         )}
+
       </div>
     </div>
   );

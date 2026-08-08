@@ -13,19 +13,15 @@ interface ManualItem {
 export default function ComprarPage() {
   const { estoque } = useAppStore();
 
-  // Itens vindos do estoque baixo
   const baixos = estoque.filter(
     (e) => (e.qtdMinima > 0 ? (e.qtdAtual / e.qtdMinima) * 100 : 100) <= 70
   );
 
   const [checkedStockIds, setCheckedStockIds] = useState<Record<string, boolean>>({});
-
-  // Itens adicionados manualmente
   const [manualItems, setManualItems] = useState<ManualItem[]>([
     { id: 'm-1', nome: 'Café', checked: false },
     { id: 'm-2', nome: 'Açúcar', checked: false },
   ]);
-
   const [showAddModal, setShowAddModal] = useState(false);
   const [newManualNome, setNewManualNome] = useState('');
 
@@ -41,12 +37,10 @@ export default function ComprarPage() {
 
   const handleAddManualItem = () => {
     if (!newManualNome.trim()) return;
-    const newItem: ManualItem = {
-      id: `manual-${Date.now()}`,
-      nome: newManualNome.trim(),
-      checked: false,
-    };
-    setManualItems((prev) => [...prev, newItem]);
+    setManualItems((prev) => [
+      ...prev,
+      { id: `manual-${Date.now()}`, nome: newManualNome.trim(), checked: false },
+    ]);
     setNewManualNome('');
     setShowAddModal(false);
     toast.success('Item adicionado à lista!', {
@@ -55,168 +49,149 @@ export default function ComprarPage() {
   };
 
   return (
-    <div className="scroll-area h-full pt-20 pb-28 px-6 flex flex-col gap-6">
-      {/* Title */}
-      <section>
-        <h1 className="font-display font-bold text-3xl text-on-surface">Minha Lista</h1>
-      </section>
+    <div className="h-full overflow-y-auto overflow-x-hidden pb-32 pt-16" style={{ WebkitOverflowScrolling: 'touch' }}>
+      <div className="px-4 flex flex-col gap-5">
 
-      {/* Manual Add Button */}
-      <button
-        onClick={() => setShowAddModal(true)}
-        className="w-full h-12 flex items-center justify-center gap-2 glass-panel border border-white/10 rounded-xl hover:bg-white/5 active:border-[#39FF14]/50 transition-all text-[#39FF14] font-label text-sm cursor-pointer"
-      >
-        <Plus className="w-4 h-4" />
-        <span>Adicionar item manualmente</span>
-      </button>
+        {/* Page Title */}
+        <section className="pt-4">
+          <h1 className="font-display font-bold text-3xl text-white">Minha Lista</h1>
+        </section>
 
-      {/* Section 1: Vindo do Estoque Baixo */}
-      <section className="flex flex-col gap-3">
-        <div className="flex items-center justify-between px-1">
-          <h2 className="font-display font-semibold text-base text-on-surface">
-            Vindo do Estoque Baixo
-          </h2>
-          <span className="bg-[#FF3131]/10 border border-[#FF3131]/20 text-[#FF3131] font-label text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-full flex items-center gap-1 shadow-[0_0_12px_rgba(255,49,49,0.15)]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#FF3131] animate-pulse" />
-            Estoque Baixo
-          </span>
-        </div>
+        {/* Add Manually Button */}
+        <button
+          onClick={() => setShowAddModal(true)}
+          className="w-full h-12 flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] text-[#39FF14] text-sm font-label hover:bg-white/[0.06] active:scale-[0.98] transition-all"
+        >
+          <Plus className="w-4 h-4" />
+          Adicionar item manualmente
+        </button>
 
-        {baixos.length === 0 ? (
-          <div className="glass-panel rounded-xl p-4 text-center text-xs text-on-surface-variant">
-            Nenhum item com estoque baixo no momento 🎉
+        {/* Section: Vindo do Estoque Baixo */}
+        <section className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display font-semibold text-base text-white">Vindo do Estoque Baixo</h2>
+            <div className="flex items-center gap-1.5 bg-[#FF3131]/10 border border-[#FF3131]/25 rounded-full px-2.5 py-1">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#FF3131] animate-pulse" />
+              <span className="text-[10px] font-label uppercase tracking-widest text-[#FF3131]">Estoque Baixo</span>
+            </div>
           </div>
-        ) : (
-          <div className="glass-panel rounded-xl flex flex-col overflow-hidden border border-white/10">
-            {baixos.map((item, idx) => {
-              const isChecked = !!checkedStockIds[item.id];
-              const isLast = idx === baixos.length - 1;
 
-              return (
-                <div
-                  key={item.id}
-                  onClick={() => toggleStockChecked(item.id)}
-                  className={`flex items-center justify-between p-4 min-h-[56px] cursor-pointer hover:bg-white/[0.02] transition-colors ${
-                    !isLast ? 'border-b border-white/5' : ''
-                  }`}
-                >
-                  <div className="flex flex-col">
-                    <span
-                      className={`font-body text-sm text-on-surface transition-all ${
-                        isChecked ? 'line-through opacity-40' : ''
-                      }`}
-                    >
-                      {item.produto}
-                    </span>
-                    <span className="font-label text-xs text-on-surface-variant/60">
-                      Necessário: {Math.max(1, item.qtdMinima - item.qtdAtual)} {item.unidade}
-                    </span>
-                  </div>
-
+          {baixos.length === 0 ? (
+            <div className="rounded-2xl p-5 text-center text-xs text-white/40 border border-white/10 bg-white/[0.03]">
+              Nenhum item com estoque baixo 🎉
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] overflow-hidden">
+              {baixos.map((item, idx) => {
+                const isChecked = !!checkedStockIds[item.id];
+                const isLast = idx === baixos.length - 1;
+                return (
                   <div
-                    className={`w-6 h-6 rounded-full border transition-all duration-300 flex items-center justify-center ${
-                      isChecked
-                        ? 'border-[#39FF14] bg-[#39FF14]/20 shadow-[0_0_12px_rgba(57,255,20,0.3)]'
-                        : 'border-white/30'
-                    }`}
+                    key={item.id}
+                    onClick={() => toggleStockChecked(item.id)}
+                    className={`flex items-center justify-between px-4 py-4 min-h-[64px] cursor-pointer hover:bg-white/[0.03] active:bg-white/[0.05] transition-colors ${!isLast ? 'border-b border-white/[0.06]' : ''}`}
                   >
-                    {isChecked && <Check className="w-3.5 h-3.5 text-[#39FF14]" strokeWidth={3} />}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </section>
+                    <div className="flex flex-col gap-0.5">
+                      <span className={`font-body text-sm text-white transition-all ${isChecked ? 'line-through opacity-40' : ''}`}>
+                        {item.produto}
+                      </span>
+                      <span className="text-[10px] text-white/40 font-label">
+                        Necessário: {Math.max(1, item.qtdMinima - item.qtdAtual)} {item.unidade}
+                      </span>
+                    </div>
 
-      {/* Section 2: Adicionados Manualmente */}
-      <section className="flex flex-col gap-3">
-        <div className="px-1">
-          <h2 className="font-display font-semibold text-base text-on-surface">
-            Adicionados Manualmente
-          </h2>
-        </div>
-
-        {manualItems.length === 0 ? (
-          <div className="glass-panel rounded-xl p-4 text-center text-xs text-on-surface-variant">
-            Nenhum item adicionado manualmente
-          </div>
-        ) : (
-          <div className="glass-panel rounded-xl flex flex-col overflow-hidden border border-white/10">
-            {manualItems.map((item, idx) => {
-              const isLast = idx === manualItems.length - 1;
-
-              return (
-                <div
-                  key={item.id}
-                  onClick={() => toggleManualChecked(item.id)}
-                  className={`flex items-center justify-between p-4 min-h-[56px] cursor-pointer hover:bg-white/[0.02] transition-colors ${
-                    !isLast ? 'border-b border-white/5' : ''
-                  }`}
-                >
-                  <div className="flex flex-col">
-                    <span
-                      className={`font-body text-sm text-on-surface transition-all ${
-                        item.checked ? 'line-through opacity-40' : ''
-                      }`}
+                    <div
+                      className="w-6 h-6 rounded-full border flex items-center justify-center transition-all duration-300 shrink-0"
+                      style={{
+                        borderColor: isChecked ? '#39FF14' : 'rgba(255,255,255,0.25)',
+                        background: isChecked ? 'rgba(57,255,20,0.15)' : 'transparent',
+                        boxShadow: isChecked ? '0 0 10px rgba(57,255,20,0.3)' : 'none',
+                      }}
                     >
+                      {isChecked && <Check className="w-3.5 h-3.5 text-[#39FF14]" strokeWidth={3} />}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
+
+        {/* Section: Adicionados Manualmente */}
+        <section className="flex flex-col gap-3">
+          <h2 className="font-display font-semibold text-base text-white">Adicionados Manualmente</h2>
+
+          {manualItems.length === 0 ? (
+            <div className="rounded-2xl p-5 text-center text-xs text-white/40 border border-white/10 bg-white/[0.03]">
+              Nenhum item adicionado manualmente
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] overflow-hidden">
+              {manualItems.map((item, idx) => {
+                const isLast = idx === manualItems.length - 1;
+                return (
+                  <div
+                    key={item.id}
+                    onClick={() => toggleManualChecked(item.id)}
+                    className={`flex items-center justify-between px-4 py-4 min-h-[64px] cursor-pointer hover:bg-white/[0.03] active:bg-white/[0.05] transition-colors ${!isLast ? 'border-b border-white/[0.06]' : ''}`}
+                  >
+                    <span className={`font-body text-sm text-white transition-all ${item.checked ? 'line-through opacity-40' : ''}`}>
                       {item.nome}
                     </span>
-                  </div>
 
-                  <div
-                    className={`w-6 h-6 rounded-full border transition-all duration-300 flex items-center justify-center ${
-                      item.checked
-                        ? 'border-[#39FF14] bg-[#39FF14]/20 shadow-[0_0_12px_rgba(57,255,20,0.3)]'
-                        : 'border-white/30'
-                    }`}
-                  >
-                    {item.checked && <Check className="w-3.5 h-3.5 text-[#39FF14]" strokeWidth={3} />}
+                    <div
+                      className="w-6 h-6 rounded-full border flex items-center justify-center transition-all duration-300 shrink-0"
+                      style={{
+                        borderColor: item.checked ? '#39FF14' : 'rgba(255,255,255,0.25)',
+                        background: item.checked ? 'rgba(57,255,20,0.15)' : 'transparent',
+                        boxShadow: item.checked ? '0 0 10px rgba(57,255,20,0.3)' : 'none',
+                      }}
+                    >
+                      {item.checked && <Check className="w-3.5 h-3.5 text-[#39FF14]" strokeWidth={3} />}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </section>
+                );
+              })}
+            </div>
+          )}
+        </section>
 
-      {/* Modal Adicionar Item Manual */}
+      </div>
+
+      {/* Modal Adicionar Item */}
       <AnimatePresence>
         {showAddModal && (
           <motion.div
-            className="fixed inset-0 bg-black/60 z-[60] backdrop-blur-sm"
+            className="fixed inset-0 bg-black/70 z-[60] backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowAddModal(false)}
           >
             <motion.div
-              className="fixed bottom-0 left-0 w-full bg-[rgba(20,25,35,0.95)] backdrop-blur-[32px] border-t border-white/10 rounded-t-3xl z-[70] p-6 pb-10 flex flex-col gap-5"
+              className="fixed bottom-0 left-0 w-full rounded-t-3xl z-[70] p-6 pb-10 flex flex-col gap-5"
+              style={{ background: 'rgba(15, 17, 22, 0.97)', backdropFilter: 'blur(32px)', borderTop: '1px solid rgba(255,255,255,0.1)' }}
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 300 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="w-12 h-1 bg-white/20 rounded-full mx-auto -mt-1" />
+              <div className="w-12 h-1 bg-white/15 rounded-full mx-auto -mt-1" />
 
               <div className="flex justify-between items-center">
-                <h3 className="font-display font-semibold text-xl text-on-surface">
-                  Adicionar Item à Lista
-                </h3>
-                <button
-                  onClick={() => setShowAddModal(false)}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:text-white transition-colors"
-                >
+                <h3 className="font-display font-semibold text-xl text-white">Adicionar à Lista</h3>
+                <button onClick={() => setShowAddModal(false)} className="w-8 h-8 rounded-full flex items-center justify-center text-white/40 hover:text-white">
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
-                  <label className="font-label text-xs text-on-surface-variant">Nome do Item</label>
+                  <label className="text-xs text-white/40 font-label">Nome do Item</label>
                   <input
-                    className="glass-panel rounded-lg p-3 text-on-surface font-body text-base outline-none focus:border-[#39FF14] transition-colors"
+                    className="rounded-xl p-3.5 text-white font-body text-base outline-none transition-colors"
+                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
                     placeholder="Ex: Café, Leite, Pão..."
                     value={newManualNome}
                     onChange={(e) => setNewManualNome(e.target.value)}
@@ -226,10 +201,11 @@ export default function ComprarPage() {
                 </div>
 
                 <button
-                  className="w-full bg-[#39FF14] text-black font-display font-bold py-3.5 rounded-xl shadow-[0_0_20px_rgba(57,255,20,0.4)] active:scale-95 transition-all flex items-center justify-center gap-2 mt-2"
+                  className="w-full py-4 rounded-xl text-black font-display font-bold text-base flex items-center justify-center gap-2 active:scale-95 transition-all"
+                  style={{ background: '#39FF14', boxShadow: '0 0 24px rgba(57,255,20,0.4)' }}
                   onClick={handleAddManualItem}
                 >
-                  <Plus className="w-5 h-5" /> Adicionar à Lista
+                  <Plus className="w-5 h-5" /> Adicionar
                 </button>
               </div>
             </motion.div>
